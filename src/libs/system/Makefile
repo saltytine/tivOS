@@ -1,8 +1,8 @@
-COMPILER = ~/opt/cross/bin/i686-cavos-gcc
-ARCHIVER = ~/opt/cross/bin/i686-cavos-ar
+COMPILER = ~/opt/cross/bin/i686-tivos-gcc
+ARCHIVER = ~/opt/cross/bin/i686-tivos-ar
 CFLAGS = -std=gnu99 -ffreestanding -Wall -Wextra -fno-builtin -nostartfiles -nostdlib -c -fpic
 
-BIN_OUTPUT = main.cav
+BIN_OUTPUT = main.tiv
 LIB_OUTPUT = libsystem.a
 
 all: clean compile
