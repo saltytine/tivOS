@@ -7,7 +7,7 @@ index 63c1f1c8b..049b2826a 100755
  	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
  	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
 -	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx*)
-+	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | cavos* | emx*)
++	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | tivos* | emx*)
  		;;
  	# This one is extra strict with allowed versions
  	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
@@ -19,8 +19,8 @@ index df90720b7..a3d03e6c8 100755
  
  # Check for special fix rules for particular targets
  case $machine in
-+    *-cavos* | \
-+    *-*-cavos* | \
++    *-tivos* | \
++    *-*-tivos* | \
      i?86-*-cygwin* | \
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
@@ -50,7 +50,7 @@ index bf809ef95..88e9da68c 100644
  
  # Common parts for widely ported systems.
  case ${target} in
-+*-*-cavos*)
++*-*-tivos*)
 +  gas=yes
 +  gnu_ld=yes
 +  default_use_cxa_atexit=yes
@@ -63,27 +63,27 @@ index bf809ef95..88e9da68c 100644
  esac
  
  case ${target} in
-+i[34567]86-*-cavos*)
-+    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h cavos.h"
++i[34567]86-*-tivos*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h tivos.h"
 +    ;;
-+x86_64-*-cavos*)
-+    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h cavos.h"
++x86_64-*-tivos*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h tivos.h"
 +    ;;
  aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
  	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
  	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
-diff --git a/gcc/config/cavos.h b/gcc/config/cavos.h
+diff --git a/gcc/config/tivos.h b/gcc/config/tivos.h
 new file mode 100644
 index 000000000..7617c43ba
 --- /dev/null
-+++ b/gcc/config/cavos.h
++++ b/gcc/config/tivos.h
 @@ -0,0 +1,42 @@
 +/* Useful if you wish to make target-specific GCC changes. */
-+#undef TARGET_CAVOS
-+#define TARGET_CAVOS 1
++#undef TARGET_TIVOS
++#define TARGET_TIVOS 1
 +
 +/* Default arguments you want when running your
-+	 i686-cavos-gcc/x86_64-cavos-gcc toolchain */
++	 i686-tivos-gcc/x86_64-tivos-gcc toolchain */
 +#undef LIB_SPEC
 +#define LIB_SPEC "-lc" /* link against C standard library */
 +
@@ -112,10 +112,10 @@ index 000000000..7617c43ba
 +#define TARGET_OS_CPP_BUILTINS()    \
 +	do                                \
 +	{                                 \
-+		builtin_define("__cavos__");    \
++		builtin_define("__tivos__");    \
 +		builtin_define("__unix__");     \
 +		builtin_define("__linux__");    \
-+		builtin_assert("system=cavos"); \
++		builtin_assert("system=tivos"); \
 +		builtin_assert("system=unix");  \
 +		builtin_assert("system=posix"); \
 +		builtin_assert("system=linux"); \
@@ -215,11 +215,11 @@ index 45f8e19ad..7bdb2dfe1 100644
  esac
  
  case ${host} in
-+i[34567]86-*-cavos*)
++i[34567]86-*-tivos*)
 +	extra_parts="$extra_parts crti.o crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o crtn.o gcrt1.o"
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
 +	;;
-+x86_64-*-cavos*)
++x86_64-*-tivos*)
 +	extra_parts="$extra_parts crti.o crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o crtn.o gcrt1.o"
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
 +	;;
@@ -287,7 +287,7 @@ index ff44d5ae0..441708d5d 100644
  AC_DEFUN([GLIBCXX_CROSSCONFIG],[
  # Base decisions on target environment.
  case "${host}" in
-+  *-cavos*)
++  *-tivos*)
 +    GLIBCXX_CHECK_COMPILER_FEATURES
 +    GLIBCXX_CHECK_LINKER_FEATURES
 +    GLIBCXX_CHECK_MATH_SUPPORT
