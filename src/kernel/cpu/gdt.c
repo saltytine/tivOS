@@ -2,7 +2,6 @@
 #include <util.h>
 
 // GDT & TSS Entry configurator
-// Copyright (C) 2024 Panagiotis
 
 static GDTEntries gdt;
 static GDTPtr     gdtr;
