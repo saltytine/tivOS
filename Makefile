@@ -7,9 +7,9 @@ all: disk
 remusl: cleanmusl musl
 
 cleanmusl:
-	rm -rf src/libs/musl/cavos-build
-	rm -rf src/libs/musl/cavos-out/include
-	rm -rf src/libs/musl/cavos-out/lib
+	rm -rf src/libs/musl/tivos-build
+	rm -rf src/libs/musl/tivos-out/include
+	rm -rf src/libs/musl/tivos-out/lib
 
 musl:
 	chmod +x src/libs/musl/build.sh
@@ -47,18 +47,18 @@ disk_dirty: disk_prepare
 	@$(MAKE) -C src/kernel disk_dirty
 
 # Verify our toolchain is.. there!
-TOOLCHAIN_GCC_VERSION := $(shell ~/opt/cross/bin/x86_64-cavos-gcc --version 2>/dev/null)
+TOOLCHAIN_GCC_VERSION := $(shell ~/opt/cross/bin/x86_64-tivos-gcc --version 2>/dev/null)
 GCC_CHECK_DATE = 1727727259
-GCC_ACTUAL_DATE := $(shell stat -c %Y ~/opt/cross/bin/x86_64-cavos-gcc)
+GCC_ACTUAL_DATE := $(shell stat -c %Y ~/opt/cross/bin/x86_64-tivos-gcc)
 verifytools:
 ifdef TOOLCHAIN_GCC_VERSION
 	@echo "$(TOOLCHAIN_GCC_VERSION)"
 else
-	@echo -e '\033[0;31mx86_64-cavos-gcc was not found! Please use "make tools" to compile the toolchain!\033[0m'
+	@echo -e '\033[0;31mx86_64-tivos-gcc was not found! Please use "make tools" to compile the toolchain!\033[0m'
 	@exit 1
 endif
 	@if [ $(GCC_ACTUAL_DATE) -lt $(GCC_CHECK_DATE) ]; then \
-		echo -e '\033[0;31mThe cavOS toolchain is outdated! Please remove the ~/opt/cross/ directory and re-build it via "make tools"!\033[0m'; \
+		echo -e '\033[0;31mThe tivOS toolchain is outdated! Please remove the ~/opt/cross/ directory and re-build it via "make tools"!\033[0m'; \
 		exit 1; \
 	fi
 
@@ -102,7 +102,7 @@ FIND_CMD = find src/kernel/ -type f \
 CLANG_FORMAT_STYLE:=-style='{ BasedOnStyle: LLVM, AlignConsecutiveDeclarations: true, IndentWidth: 2 }'
 
 # Embedded clang-format (I came across big issues when versions do not match perfectly)
-CLANG_FORMAT_TARGET="$(HOME)/opt/clang-format-cavos"
+CLANG_FORMAT_TARGET="$(HOME)/opt/clang-format-tivos"
 format_prerequisites:
 	@chmod +x tools/toolchain/get_formatter.sh
 	@tools/toolchain/get_formatter.sh
