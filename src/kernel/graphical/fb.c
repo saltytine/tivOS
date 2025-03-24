@@ -6,7 +6,6 @@
 #include <util.h>
 
 // System framebuffer manager
-// Copyright (C) 2024 Panagiotis
 
 uint8_t *framebuffer = 0;
 
