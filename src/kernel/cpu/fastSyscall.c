@@ -5,7 +5,6 @@
 #include <system.h>
 
 // Prepares the "syscall" instruction x86_64 provides
-// Copyright (C) 2024 Panagiotis
 
 bool checkSyscallInst() {
   uint32_t eax = 0x80000001, ebx = 0, ecx = 0, edx = 0;
