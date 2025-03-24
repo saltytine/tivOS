@@ -14,7 +14,6 @@
 
 // Generic AHCI driver (tested on real hardware)
 // Tried to keep the code as simple as I could, good for educational purposes
-// Copyright (C) 2024 Panagiotis
 
 const AHCI_DEVICE *isAHCIcontroller(PCIdevice *device) {
   for (int i = 0; i < (sizeof(ahci_ids) / sizeof(ahci_ids[0])); i++) {
