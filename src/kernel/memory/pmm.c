@@ -6,7 +6,6 @@
 #include <vmm.h>
 
 // Physical memory space manager/allocator
-// Copyright (C) 2024 Panagiotis
 
 void initiatePMM() {
   DS_Bitmap *bitmap = &physical; // pointer to pmm bitmap (used later)
