@@ -3,7 +3,6 @@
 #include <util.h>
 
 // IDT Entry configurator
-// Copyright (C) 2024 Panagiotis
 
 #define IDT_ENTRIES 256
 static idt_gate_t     idt[IDT_ENTRIES] = {0};
