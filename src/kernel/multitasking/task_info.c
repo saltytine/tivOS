@@ -15,7 +15,6 @@
 #include <vmm.h>
 
 // Spliting struct Task into smaller chunks to allow sharing
-// Copyright (C) 2025 Panagiotis
 
 // CLONE_FS
 TaskInfoFs *taskInfoFsAllocate() {
