@@ -6,7 +6,6 @@
 #include <system.h>
 
 // PCI driver
-// Copyright (C) 2024 Panagiotis
 
 /* PCI abstraction */
 
