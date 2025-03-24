@@ -35,7 +35,6 @@
 #include <vmm.h>
 
 // Kernel entry file
-// Copyright (C) 2024 Panagiotis
 
 static volatile LIMINE_BASE_REVISION(2);
 void _start(void) {
