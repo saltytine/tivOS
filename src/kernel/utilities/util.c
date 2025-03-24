@@ -1,7 +1,6 @@
 #include <util.h>
 
 // Utilities used inside source code
-// Copyright (C) 2024 Panagiotis
 
 const char *ANSI_RESET = "\e[0m";
 const char *ANSI_BLACK = "\e[0;30m";
