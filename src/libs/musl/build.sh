@@ -11,7 +11,7 @@ MUSL_RELEASE="musl-1.2.5"
 cd "${SCRIPTPATH}"
 
 # --noreplace -> won't re-compile if it finds libc
-if test -f "$SCRIPTPATH/cavos-out/lib/libc.a"; then
+if test -f "$SCRIPTPATH/tivos-out/lib/libc.a"; then
 	if [ "$#" -eq 1 ]; then
 		exit 0
 	fi
@@ -28,16 +28,16 @@ if ! test -f "$SCRIPTPATH/$MUSL_RELEASE/README"; then
 	# cd ../
 fi
 
-# Ensure the cavOS toolchain's in PATH
+# Ensure the tivOS toolchain's in PATH
 if [[ ":$PATH:" != *":$HOME/opt/cross/bin:"* ]]; then
 	export PATH=$HOME/opt/cross/bin:$PATH
 fi
 
 # Booo! Scary!
-export PREFIX="${SCRIPTPATH}/cavos-out"
-mkdir -p cavos-build
-cd cavos-build
-CC=x86_64-cavos-gcc ARCH=x86_64 CROSS_COMPILE=x86_64-cavos- "../$MUSL_RELEASE/configure" --target=x86_64-cavos --build=x86_64-cavos --host=x86_64-cavos --prefix="$PREFIX" --syslibdir="/lib" --enable-debug
+export PREFIX="${SCRIPTPATH}/tivos-out"
+mkdir -p tivos-build
+cd tivos-build
+CC=x86_64-tivos-gcc ARCH=x86_64 CROSS_COMPILE=x86_64-tivos- "../$MUSL_RELEASE/configure" --target=x86_64-tivos --build=x86_64-tivos --host=x86_64-tivos --prefix="$PREFIX" --syslibdir="/lib" --enable-debug
 make clean
 make all -j$(nproc)
 make install
