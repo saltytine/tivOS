@@ -7,7 +7,6 @@
 #include <task.h>
 
 // Industrial two-way solid steel pipe()
-// Copyright (C) 2024 Panagiotis
 
 #define PIPE_BUFF 65536
 typedef struct PipeInfo {
