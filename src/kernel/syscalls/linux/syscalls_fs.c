@@ -8,7 +8,6 @@
 #include <util.h>
 
 // Manages all systemcalls related to filesystem operations
-// Copyright (C) 2024 Panagiotis
 
 #define SYSCALL_READ 0
 static size_t syscallRead(int fd, char *str, uint32_t count) {
