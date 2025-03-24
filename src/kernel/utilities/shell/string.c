@@ -3,7 +3,6 @@
 #include <util.h>
 
 // String management file
-// Copyright (C) 2024 Panagiotis
 
 size_t strlength(const char *ch) {
   size_t i = 0; // Changed counter to 0
