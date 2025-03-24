@@ -1,4 +1,4 @@
-COMPILER = ~/opt/cross/bin/x86_64-cavos-gcc
+COMPILER = ~/opt/cross/bin/x86_64-tivos-gcc
 CFLAGS = -std=gnu99 -w -ffreestanding -nostartfiles -nostdlib
 OUTPUT = a
 TARGET = ../../../target/usr/bin/
