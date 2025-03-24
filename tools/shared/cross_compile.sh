@@ -2,9 +2,9 @@
 set -x # show cmds
 set -e # fail globally
 
-# Cross compile an autotools package for our custom target (x86_64-cavos)
+# Cross compile an autotools package for our custom target (x86_64-tivos)
 build_package_autotools() {
-	# Ensure the cavOS toolchain's in PATH
+	# Ensure the tivOS toolchain's in PATH
 	if [[ ":$PATH:" != *":$HOME/opt/cross/bin:"* ]]; then
 		export PATH=$HOME/opt/cross/bin:$PATH
 	fi
@@ -28,7 +28,7 @@ build_package_autotools() {
 	cd "$foldername"
 
 	# Add our target
-	sed -i 's/\# Now accept the basic system types\./cavos\*\);;/g' "$config_sub_path"
+	sed -i 's/\# Now accept the basic system types\./tivos\*\);;/g' "$config_sub_path"
 
 	# Do any optional patches
 	if [ -n "$optional_patchname" ]; then
@@ -45,7 +45,7 @@ build_package_autotools() {
 	cd build
 
 	# Compilation itself
-	../configure --prefix="$install_dir" --host=x86_64-cavos $extra_parameters
+	../configure --prefix="$install_dir" --host=x86_64-tivos $extra_parameters
 	make -j$(nproc)
 	if [ -n "$extra_install_parameters" ]; then
 		make install $extra_install_parameters
