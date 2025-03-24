@@ -4,7 +4,6 @@
 #include <system.h>
 
 // Simple serial driver for debugging
-// Copyright (C) 2024 Panagiotis
 
 Spinlock LOCK_DEBUGF = {0};
 
