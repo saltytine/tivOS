@@ -5,7 +5,6 @@
 #include <vfs.h>
 
 // Generic file path/name sanitization
-// Copyright (C) 2024 Panagiotis
 
 char  root[] = "/";
 char *fsStripMountpoint(const char *filename, MountPoint *mnt) {
