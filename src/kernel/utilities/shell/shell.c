@@ -46,7 +46,7 @@ void task3() {
 }
 
 void fetch() {
-  printf("\n      ^         name: cavOS");
+  printf("\n      ^         name: tivOS");
   printf("\n     / \\        memory: %ldMB",
          DivRoundUp(DivRoundUp(bootloader.mmTotal, 1024), 1024));
   printf("\n    /   \\       uptime: %lds", DivRoundUp(timerTicks, 1000));
@@ -67,7 +67,7 @@ void help() {
   printf("\n= dump           : Dumps some of the bitmap allocator       =");
   printf("\n= draw           : Tests framebuffer by drawing a rectangle =");
   printf("\n= proctest       : Tests multitasking support               =");
-  printf("\n= exec           : Runs a cavOS binary of your choice       =");
+  printf("\n= exec           : Runs a tivOS binary of your choice       =");
   printf("\n= bash           : GNU Bash, your portal to userspace!      =");
   printf("\n=============================================================\n");
   printf("\n========================= FILESYSTEM ========================");
@@ -90,8 +90,8 @@ void readDisk() {
 
   clearScreen();
   printf("=========================================\n");
-  printf("====        cavOS readdisk 1.0       ====\n");
-  printf("====    Copyright MalwarePad 2024    ====\n");
+  printf("====        tivOS readdisk 1.0       ====\n");
+  printf("====          For TIV by TIV         ====\n");
   printf("=========================================\n");
 
   printf("\n1MB Limine sector: LBA=0 Offset=0, FAT32 sector: LBA=2048 "
@@ -202,7 +202,7 @@ void launch_shell(int n) {
       setConsoleY(getConsoleY() + height + 16);
       printf("\n");
     } else if (strEql(ch, "drawimg")) {
-      printf("\nInput cavimg file's path: ");
+      printf("\nInput tivimg file's path: ");
       char *buff = (char *)malloc(1024);
       readStr(buff);
       printf("\n");
@@ -264,7 +264,7 @@ void launch_shell(int n) {
       printf("\nWarning: networking is still very early in testing!\n");
       printf("=========================================\n");
       printf("==       Networking configuration      ==\n");
-      printf("==      Copyright MalwarePad 2024      ==\n");
+      printf("==            For TIV by TIV           ==\n");
       printf("=========================================\n\n");
       PCI *pci = firstPCI;
       while (pci) {
@@ -372,8 +372,8 @@ void launch_shell(int n) {
     } else if (strEql(ch, "about")) {
       printf("\n");
       printf("=========================================\n");
-      printf("==        cavOS kernel shell 1.6       ==\n");
-      printf("==      Copyright MalwarePad 2024      ==\n");
+      printf("==        tivOS kernel shell 1.6       ==\n");
+      printf("==             For TIV by TIV          ==\n");
       printf("=========================================\n\n");
     } else if (strEql(ch, "fetch")) {
       fetch();
