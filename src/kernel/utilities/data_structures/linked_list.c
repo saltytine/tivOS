@@ -4,7 +4,6 @@
 
 // Linked Lists (singly, non-circular); basically just allocated structs
 // pointing at each other! Used literally everywhere in the system...
-// Copyright (C) 2024 Panagiotis
 
 /*
  * Requirement for this DS utility is that the next entry of the linked list is
