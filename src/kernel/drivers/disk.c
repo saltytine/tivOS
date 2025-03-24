@@ -5,7 +5,6 @@
 #include <util.h>
 
 // Multiple disk handler
-// Copyright (C) 2022 Panagiotis
 
 uint16_t mbr_partition_indexes[] = {MBR_PARTITION_1, MBR_PARTITION_2,
                                     MBR_PARTITION_3, MBR_PARTITION_4};
