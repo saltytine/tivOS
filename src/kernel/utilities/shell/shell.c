@@ -19,7 +19,6 @@
 #include <lwip/dns.h>
 
 // Temporary kernelspace shell
-// Copyright (C) 2024 Panagiotis
 
 void task1() {
   for (int i = 0; i < 8; i++) {
