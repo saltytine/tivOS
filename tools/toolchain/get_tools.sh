@@ -8,7 +8,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 cd "${SCRIPTPATH}"
 
 export PREFIX="$HOME/opt/cross"
-export TARGET=x86_64-cavos
+export TARGET=x86_64-tivos
 export SYSROOT="$SCRIPTPATH/../../target"
 export PATH="$PREFIX/bin:$PATH"
 
