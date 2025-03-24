@@ -15,7 +15,6 @@
 #include <vmm.h>
 
 // Task manager allowing for task management
-// Copyright (C) 2024 Panagiotis
 
 SpinlockCnt TASK_LL_MODIFY = {0};
 
