@@ -13,7 +13,6 @@
 
 // Realtek RTL8139 network card support (10/100Mbit)
 // (as per https://wiki.osdev.org/RTL8139, clones may be different)
-// Copyright (C) 2024 Panagiotis
 
 // TODO! For legacy devices like these (with only 32-bit memory support), make
 // some sort of memory-reservation interface to reserve lower addresses for
