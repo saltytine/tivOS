@@ -16,7 +16,6 @@
 #include <vfs.h>
 
 // Testing stuff
-// Copyright (C) 2024 Panagiotis
 
 #include "lwip/err.h"
 #include "lwip/netdb.h"
