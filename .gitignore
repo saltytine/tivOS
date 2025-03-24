@@ -1,0 +1,45 @@
+# Binaries
+target/boot/*.bin
+target/usr/bin/*
+target/usr/sbin
+target/usr/lib
+target/lib
+disk.img
+disk.vmdk
+
+# Libraries
+target/usr/include/ncursesw
+target/usr/etc/profile.d
+target/usr/libexec
+target/usr/x86_64-cavos
+target/usr/x86_64-linux-musl
+
+# Chroot stuff
+target/dev/shm
+target/run
+target/sys
+target/proc
+target/dev/pts
+target/dev
+target/bin
+target/etc/ssl
+
+# Limine repository
+src/bootloader/limine
+src/bootloader/.version
+
+# Misc (on the target system)
+target/etc/localtime
+target/usr/share
+
+pci.ids
+
+# Wireshark network dumps
+*.pcapng
+
+# Could obviously contain sensitive data
+.idea/
+Session.vim
+
+# uACPI
+.version_uacpi
