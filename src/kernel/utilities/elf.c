@@ -16,7 +16,6 @@
 #include <vmm.h>
 
 // ELF (for now only 64) parser
-// Copyright (C) 2024 Panagiotis
 
 #define ELF_DEBUG 0
 
@@ -91,7 +90,7 @@ Task *elfExecute(char *filepath, uint32_t argc, char **argv, uint32_t envc,
   Elf64_Ehdr *elf_ehdr = (Elf64_Ehdr *)(out);
 
   if (!elf_check_file(elf_ehdr)) {
-    debugf("[elf] File %s is not a valid cavOS ELF32 executable!\n", filepath);
+    debugf("[elf] File %s is not a valid tivOS ELF32 executable!\n", filepath);
     return 0;
   }
 
