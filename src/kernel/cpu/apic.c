@@ -8,7 +8,6 @@
 
 // Advanced Programmable Interrupt Controller driver
 // (fancy way to say SMP-friendly 8259 PIC)
-// Copyright (C) 2024 Panagiotis
 
 /*
  * Trigger mode: 0 is edge-triggered, 1 is level-triggered.
