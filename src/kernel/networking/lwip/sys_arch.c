@@ -11,8 +11,7 @@
 #include <lwip/sys.h>
 #include <timer.h>
 
-// lwip glue code for cavOS
-// Copyright (C) 2024 Panagiotis
+// lwip glue code for tivOS
 
 void sys_init(void) {
   // boo!
