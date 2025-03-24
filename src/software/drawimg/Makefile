@@ -1,4 +1,4 @@
-COMPILER = ~/opt/cross/bin/x86_64-cavos-gcc
+COMPILER = ~/opt/cross/bin/x86_64-tivos-gcc
 CFLAGS = -std=gnu99 -Wall -Wextra -static
 OUTPUT = drawimg
 TARGET = ../../../target/usr/bin/
