@@ -8,7 +8,6 @@
 #include <vga.h>
 
 // PS/2 mouse driver, should work with USB mice too
-// Copyright (C) 2024 Panagiotis
 
 void mouseWait(uint8_t a_type) {
   uint32_t timeout = MOUSE_TIMEOUT;
