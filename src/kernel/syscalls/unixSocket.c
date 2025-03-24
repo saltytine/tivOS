@@ -8,7 +8,6 @@
 #include <lwip/sockets.h>
 
 // AF_UNIX socket implementation (still needs a lot of testing)
-// Copyright (C) 2025 Panagiotis
 
 OpenFile *unixSocketAcceptCreate(UnixSocketPair *dir) {
   size_t sockFd = fsUserOpen(currentTask, "/dev/null", O_RDWR, 0);
