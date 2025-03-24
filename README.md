@@ -1,14 +1,5 @@
-# Cave-Like Operating System
-cavOS is a POSIX-compliant operating system in C. An active effort of making a full OS, with a simple and readable codebase.
-
-[![GitHub top language](https://img.shields.io/github/languages/top/malwarepad/cavOS?logo=c&label=)](https://github.com/malwarepad/cavOS/blob/master/src/kernel/Makefile)
-[![GitHub license](https://img.shields.io/github/license/malwarepad/cavOS)](https://github.com/malwarepad/cavOS/blob/master/LICENSE)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e78ad48f394f46d1bb98f1942c7e1f21)]()
-[![GitHub contributors](https://img.shields.io/github/contributors/malwarepad/cavOS)](https://github.com/malwarepad/cavOS/graphs/contributors)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/malwarepad/cavOS)](https://github.com/malwarepad/cavOS/commits)
-
-## Preview of the OS
-![Preview of the OS](https://raw.malwarepad.com/cavos/images/preview3.png)
+# TIV Operating System
+tivOS is a POSIX-compliant operating system in C. An active effort of making a full OS, with a simple and readable codebase.
 
 ## Why make your own OS in [insert year]?
 > **because I can.**
@@ -16,7 +7,7 @@ cavOS is a POSIX-compliant operating system in C. An active effort of making a f
 Having a good time is my drive for this project + I learn a lot of cool low level stuff alongside that! 
 
 ## Kernel status
-The cavOS kernel is a monolithic x86_64 one written in relatively simple C with a few bits of Intel assembly here and there. It uses the Limine bootloader and leverages the FAT32 filesystem for booting along with Ext2 for the root partition. I try to keep the code structure clean and fairly easy to understand, while avoiding too much abstraction. Hence, code quality and clarity are sometimes prioritized over performance gains.
+The tivOS kernel is a monolithic x86_64 one written in relatively simple C with a few bits of Intel assembly here and there. It uses the Limine bootloader and leverages the FAT32 filesystem for booting along with Ext2 for the root partition. I try to keep the code structure clean and fairly easy to understand, while avoiding too much abstraction. Hence, code quality and clarity are sometimes prioritized over performance gains.
 
 - x86_64 pre-emptive kernel that is Unix-like and POSIX-compliant
 - Architecture features fully supported (GDT, IDT, ISR, (I/O)APIC, SSE, LAPIC timer, RTC clock, `syscall` instruction)
@@ -32,10 +23,10 @@ The cavOS kernel is a monolithic x86_64 one written in relatively simple C with 
 - BIOS/UEFI framebuffer utilization and exposure to userland via /dev/fb0
 
 ## Userspace status
-Userspace is my primary focus at the time being, with the kernel being *quite* stable. I'm trying to make this OS as close to Linux as I can, while adding my own stuff on top of it. This is visible with the system calls that are exactly like Linux's. That isn't random, I want cavOS to be as binary compatible with it as possible!
+Userspace is my primary focus at the time being, with the kernel being *quite* stable. I'm trying to make this OS as close to Linux as I can, while adding my own stuff on top of it. This is visible with the system calls that are exactly like Linux's. That isn't random, I want tivOS to be as binary compatible with it as possible!
 
 ## Is this a Linux distribution?
-No! The cavOS kernel does not share source code or headers with Linux. The Linux source code *is* pulled during userspace assembly, but only because some third party (ported) programs depend on [it's headers](https://wiki.gentoo.org/wiki/Linux-headers). Even then, no actual code is shared.
+No! The tivOS kernel does not share source code or headers with Linux. The Linux source code *is* pulled during userspace assembly, but only because some third party (ported) programs depend on [it's headers](https://wiki.gentoo.org/wiki/Linux-headers). Even then, no actual code is shared.
 
 ## Documentation
 - **Contributing:** Information about contribution guidelines & suggestions [docs/contributing.md](docs/contributing.md)
