@@ -8,7 +8,6 @@
 #include <system.h>
 
 // Very bare bones, and basic keyboard driver
-// Copyright (C) 2024 Panagiotis
 
 char characterTable[] = {
     0,    27,   '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  '0',
