@@ -16,7 +16,7 @@ def resize_image(input_path, output_path, target_width, target_height):
             file.write(hex_values)
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python png_to_cavimg <input_png_file> <output_hex_file>")
+        print("Usage: python png_to_tivimg <input_png_file> <output_hex_file>")
         sys.exit(1)
     input_file = sys.argv[1]
     output_file = sys.argv[2]
