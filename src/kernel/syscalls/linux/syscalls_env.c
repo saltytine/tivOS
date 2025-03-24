@@ -24,8 +24,8 @@ static size_t syscallGetcwd(char *buff, size_t size) {
 }
 
 // Beware the 65 character limit!
-char sysname[] = "Cave-Like Operating System";
-char nodename[] = "cavOS";
+char sysname[] = "TIV Operating System";
+char nodename[] = "tivOS";
 char release[] = "0.69.2";
 char version[] = "0.69.2";
 char machine[] = "x86_64";
