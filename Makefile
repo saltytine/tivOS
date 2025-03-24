@@ -85,7 +85,7 @@ vmware:
 
 # Development tools
 ringhome:
-	cmd.exe /c C:/Users/Panagiotis/ring.bat
+	cmd.exe /c C:/Users/saltine/ring.bat
 dev: clean disk_dirty qemu_dbg
 
 # Code formatting tools
