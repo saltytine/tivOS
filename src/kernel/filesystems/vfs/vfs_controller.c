@@ -13,7 +13,6 @@
 #include <vfs.h>
 
 // Simple VFS abstraction to manage filesystems
-// Copyright (C) 2024 Panagiotis
 
 OpenFile *fsRegisterNode(Task *task) {
   TaskInfoFiles *files = task->infoFiles;
