@@ -7,7 +7,6 @@
 #include <vmm.h>
 
 // Virtual memory space manager/allocator
-// Copyright (C) 2024 Panagiotis
 
 #define VMM_DEBUG 0
 
