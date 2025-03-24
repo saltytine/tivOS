@@ -1,0 +1,54 @@
+{
+  "deepscan.enable": true,
+  "files.associations": {
+    "*.c": "c",
+    "*.h": "c"
+  },
+  "C_Cpp.clang_format_style": "{ BasedOnStyle: LLVM, AlignConsecutiveDeclarations: true, IndentWidth: 2 }",
+  "C_Cpp.default.compilerArgs": [
+    "-I${workspaceRoot}/src/kernel/include",
+    "-I${workspaceRoot}/src/kernel/networking/lwip/include/",
+    "-m64",
+    "-c",
+    "-ffreestanding",
+    "-Wall",
+    "-fcommon",
+    "-fPIE",
+    "-mno-80387",
+    "-mno-mmx",
+    "-mno-sse",
+    "-nostartfiles",
+    "-nostdlib",
+    "-mno-sse2",
+    "-mno-red-zone",
+    "-fno-stack-protector",
+    "-fno-stack-check",
+    "-fno-lto"
+  ],
+  "clang.cflags": [
+    "-I${workspaceRoot}/src/kernel/include",
+    "-I${workspaceRoot}/src/kernel/networking/lwip/include/",
+    "-m64",
+    "-c",
+    "-ffreestanding",
+    "-Wall",
+    "-fcommon",
+    "-fPIE",
+    "-mno-80387",
+    "-mno-mmx",
+    "-mno-sse",
+    "-nostartfiles",
+    "-nostdlib",
+    "-mno-sse2",
+    "-mno-red-zone",
+    "-fno-stack-protector",
+    "-fno-stack-check",
+    "-fno-lto"
+  ],
+  "files.exclude": {
+    "**/*.o": true
+  },
+  "makefile.configureOnOpen": false,
+  "C_Cpp.formatting": "clangFormat",
+  "C_Cpp.clang_format_path": "~/opt/clang-format-cavos"
+}
