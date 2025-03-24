@@ -17,7 +17,6 @@
 #include <lwip/tcpip.h>
 
 // Manager for all connected network interfaces
-// Copyright (C) 2024 Panagiotis
 
 err_t lwipDummyInit(struct netif *netif) { return ERR_OK; }
 
