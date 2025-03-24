@@ -11,7 +11,6 @@
 #include <vmm.h>
 
 // Clock-tick triggered scheduler
-// Copyright (C) 2024 Panagiotis
 
 #define SCHEDULE_DEBUG 0
 
