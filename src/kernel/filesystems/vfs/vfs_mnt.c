@@ -13,7 +13,6 @@
 #include <vfs.h>
 
 // Different mount point separation
-// Copyright (C) 2024 Panagiotis
 
 // todo: add LL lock to mountPoints
 
