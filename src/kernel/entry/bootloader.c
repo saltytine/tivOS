@@ -3,7 +3,6 @@
 #include <system.h>
 
 // Parses information off our bootloader (limine)
-// Copyright (C) 2024 Panagiotis
 
 static volatile struct limine_paging_mode_request liminePagingreq = {
     .id = LIMINE_PAGING_MODE_REQUEST,
