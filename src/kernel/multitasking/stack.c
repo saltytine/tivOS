@@ -6,7 +6,6 @@
 #include <util.h>
 
 // Stack creation for userland & kernelspace tasks
-// Copyright (C) 2024 Panagiotis
 
 void stackGenerateMutual(Task *task) {
   // if (GetPageDirectory() != task->pagedir) {
