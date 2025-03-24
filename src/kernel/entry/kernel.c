@@ -93,8 +93,8 @@ void _start(void) {
     printf("[warning] System disk has not been detected!\n");
 
   printf("=========================================\n");
-  printf("==     Cave-Like Operating System      ==\n");
-  printf("==      Copyright MalwarePad 2024      ==\n");
+  printf("==         TIV Operating System        ==\n");
+  printf("==          From and for TIVSec        ==\n");
   printf("=========================================\n\n");
 
   run("/bin/bash", true, 0, 0);
