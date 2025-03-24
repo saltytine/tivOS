@@ -31,7 +31,7 @@ if [ "${HOST_TIMEZONE}" != "${TARGET_TIMEZONE}" ]; then
 fi
 
 # APK package manager (host)
-APK_PATH="$HOME/opt/apk-static-cavos"
+APK_PATH="$HOME/opt/apk-static-tivos"
 APK_URI="https://gitlab.alpinelinux.org/api/v4/projects/5/packages/generic/v2.14.6/x86_64/apk.static"
 APK_SHA512="782b29d10256ad07fbdfa9bf1b2ac4df9a9ae7162c836ee0ecffc991a4f75113512840f7b3959f5deb81f1d6042c15eeb407139896a8a02c57060de986489e7a"
 chmod +x "tools/shared/pass_acq.sh"
