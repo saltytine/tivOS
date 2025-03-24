@@ -2,7 +2,6 @@
 #include <system.h>
 
 // Source code for handling ports via assembly references
-// Copyright (C) 2024 Panagiotis
 
 void cpuid(uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx) {
   asm volatile("cpuid \n"
