@@ -8,7 +8,6 @@
 #include <malloc.h>
 
 // Manages /dev/std* files and the like
-// Copyright (C) 2024 Panagiotis
 
 size_t readHandler(OpenFile *fd, uint8_t *in, size_t limit) {
   // console fb
