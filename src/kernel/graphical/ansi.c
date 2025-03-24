@@ -3,7 +3,6 @@
 #include <fb.h>
 
 // ANSI-compliant terminal stuff
-// Copyright (C) 2024 Panagiotis
 
 #define IS_VALID_NUMBER(c) (((c) >= 48 && (c) <= 57))
 
