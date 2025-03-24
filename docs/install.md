@@ -1,6 +1,6 @@
 # Building Documents
 
-Compiling an operating system is not an easy task... The build environment I require for building cavOS is as simple as it gets, only needing a few UNIX utilities and obviously a cross compiler...
+Compiling an operating system is not an easy task... The build environment I require for building tivOS is as simple as it gets, only needing a few UNIX utilities and obviously a cross compiler...
 
 > **Warning!** If any step fails, do NOT proceed... Start over (double checking your dependencies) and if the issue persists, create an issue reporting it. Remember, this project is still in development!
 
@@ -9,12 +9,12 @@ Compiling an operating system is not an easy task... The build environment I req
 - nasm: The kernel includes some small assembly files ~~unfortunately~~.
 - parted: For creating the boot disk.
 - mkdosfs: For creating the FAT32 filesystem inside that disk.
-- fatlabel: For labeling that disk as CAVOS.
+- fatlabel: For labeling that disk as TIVOS.
 
 Most required packages for compiling on specific distros (listed [below](#dependencies-gnulinux)) are specifically for building the cross-compiler... More info [here](https://wiki.osdev.org/GCC_Cross-Compiler).
 
 ## Dependencies: GNU/Linux
-Compiling cavOS will work on all Linux distributions, but I've only **done testing** with the options that are **bold**, so pick wisely...
+Compiling tivOS will work on all Linux distributions, but I've only **done testing** with the options that are **bold**, so pick wisely...
 
 - **Ubuntu:** `sudo apt install -y nasm dosfstools parted bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo libisl-dev parted dosfstools build-essential autoconf automake`
 - **Fedora:** `sudo dnf install -y nasm gcc xorriso parted dosfstools make bison flex gmp-devel libmpc-devel mpfr-devel texinfo autoconf automake patch gcc-c++ isl-devel`
@@ -36,11 +36,11 @@ If you got your dependencies sorted out, then this step is relatively simple! Ju
 ## Building
 This is an operating system, meaning that it has to be burnt into some sort of medium (disk, USB, floppy drive, somewhere!)
 
-> **Warning!** In case you want to try cavOS on real hardware, while nobody is liable for any damage it might cause, many features might not be available due to a lack of drivers!
+> **Warning!** In case you want to try tivOS on real hardware, while nobody is liable for any damage it might cause, many features might not be available due to a lack of drivers!
 
 For building there are two options (although the second is mostly geared towards developers/tinkerers):
-- **Build disk.img, a fully featured pack of cavOS that includes Limine, the kernel and any software: `make disk`.**
-- Build only the kernel.bin file, cavOS kernel: `make kernel`.
+- **Build disk.img, a fully featured pack of tivOS that includes Limine, the kernel and any software: `make disk`.**
+- Build only the kernel.bin file, tivOS kernel: `make kernel`.
 
 ## Testing
 - **QEMU:** `make qemu` will launch QEMU with the recommended options on the `disk.img` disk image.
