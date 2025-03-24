@@ -10,7 +10,6 @@
 #include <stdatomic.h>
 
 // Bad (quick & dirty) uACPI glue code
-// Copyright (C) 2024 Panagiotis
 
 uacpi_status uacpi_kernel_get_rsdp(uacpi_phys_addr *out_rsdp_address) {
   *out_rsdp_address = bootloader.rsdp;
