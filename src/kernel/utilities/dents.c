@@ -2,7 +2,6 @@
 #include <util.h>
 
 // getdents64() directory entry helper
-// Copyright (C) 2024 Panagiotis
 
 DENTS_RES dentsAdd(void *buffStart, struct linux_dirent64 **dirp,
                    size_t *allocatedlimit, unsigned int hardlimit,
