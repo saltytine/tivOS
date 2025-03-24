@@ -3,7 +3,6 @@
 #include <uacpi/uacpi.h>
 
 // uACPI entry point & utilities
-// Copyright (C) 2024 Panagiotis
 
 void initiateACPI() {
   uacpi_status ret = uacpi_initialize(0);
