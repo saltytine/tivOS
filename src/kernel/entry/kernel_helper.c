@@ -10,7 +10,6 @@
 // Kernel helper thread entry...
 // It will help with cleaning up processes, managing networking, etc while
 // adhering to spinlocks (in contrast with interrupts)
-// Copyright (C) 2024 Panagiotis
 
 Task *netHelperTask = 0;
 
