@@ -4,7 +4,6 @@
 #include <vga.h>
 
 // The BIOS/UEFI GOP provided framebuffer... pretty darn basic
-// Copyright (C) 2024 Panagiotis
 
 static volatile struct limine_framebuffer_request limineFBreq = {
     .id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0};
