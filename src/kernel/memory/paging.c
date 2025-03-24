@@ -11,7 +11,6 @@
 #include <vmm.h>
 
 // System-wide page table & directory management
-// Copyright (C) 2024 Panagiotis
 
 // A small note to myself: When mapping or doing other operations, there is a
 // chance that the respective page layer (pml4, pdp, pd, pt, etc) is using
