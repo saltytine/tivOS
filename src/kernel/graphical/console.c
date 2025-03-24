@@ -10,7 +10,6 @@
 #include <vfs.h>
 
 // Kernel console implementation
-// Copyright (C) 2024 Panagiotis
 
 Spinlock LOCK_CONSOLE = ATOMIC_FLAG_INIT;
 
