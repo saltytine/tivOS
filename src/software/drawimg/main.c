@@ -33,7 +33,7 @@ char *readFullFile(char *filename) {
 
 int main(int argc, char **argv) {
   if (argc != 2) {
-    printf("Wrong parameters! Usage:\n\t./drawimg ./img.cavpng\n");
+    printf("Wrong parameters! Usage:\n\t./drawimg ./img.tivpng\n");
     exit(1);
   }
 
