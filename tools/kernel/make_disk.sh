@@ -19,7 +19,7 @@ if [ ! -d "$1/bin" ]; then
 fi
 
 if test -f /dev/loop101; then
-	echo "Loopback device designated for cavOS is already assigned to something! (/dev/loop101)"
+	echo "Loopback device designated for tivOS is already assigned to something! (/dev/loop101)"
 	exit 1
 fi
 
@@ -47,7 +47,7 @@ sudo losetup -P /dev/loop101 "${3}"
 
 if [ -z "$4" ]; then
 	sudo mkdosfs -F32 -f 2 /dev/loop101p1 || sudo mkfs.fat -F32 -f 2 /dev/loop101p1
-	sudo mke2fs -L "cavOS" -O ^dir_index /dev/loop101p2 "$(((($SIZE_IN_BLOCKS - 350000) * 512) / 1024))"
+	sudo mke2fs -L "tivOS" -O ^dir_index /dev/loop101p2 "$(((($SIZE_IN_BLOCKS - 350000) * 512) / 1024))"
 	sudo fatlabel /dev/loop101p1 LIMINE
 fi
 
