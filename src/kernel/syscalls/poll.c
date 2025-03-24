@@ -10,7 +10,6 @@
 #include <timer.h>
 
 // Polling APIs & kernel helper utility
-// Copyright (C) 2025 Panagiotis
 
 // epoll API
 size_t epollCreate1(int flags) {
