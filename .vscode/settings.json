@@ -50,5 +50,5 @@
   },
   "makefile.configureOnOpen": false,
   "C_Cpp.formatting": "clangFormat",
-  "C_Cpp.clang_format_path": "~/opt/clang-format-cavos"
+  "C_Cpp.clang_format_path": "~/opt/clang-format-tivos"
 }
