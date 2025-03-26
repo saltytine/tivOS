@@ -1,5 +1,5 @@
 # Contributing to tivOS
-> First off, I'm flattered you're willing to help with tivOS' development! So, thank you in advance for that :^)
+> First off, I'm flattered you're willing to help with tivOS' development! So, thank you in advance for that :)
 
 However, as you'd expect with any sort of kernel, **contributions of any sort go through a lot of auditing.** That also takes a lot of time, so please be patient as your submission is reviewed.
 
@@ -19,3 +19,7 @@ However, as you'd expect with any sort of kernel, **contributions of any sort go
 
 ## Go for it
 With everything out of the way, good luck solider!
+
+# Contributors:
+[@pwnjester](https://www.github.com/pwnjester)
+[@Nike](https://www.github.com/N1ke-t4)
