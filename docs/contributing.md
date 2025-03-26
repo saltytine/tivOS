@@ -21,5 +21,5 @@ However, as you'd expect with any sort of kernel, **contributions of any sort go
 With everything out of the way, good luck solider!
 
 # Contributors:
-[@pwnjester](https://www.github.com/pwnjester)
-[@Nike](https://www.github.com/N1ke-t4)
+[pwnjester](https://www.github.com/pwnjester)  
+[Nike](https://www.github.com/N1ke-t4)
