@@ -22,4 +22,5 @@ With everything out of the way, good luck solider!
 
 # Contributors:
 [pwnjester](https://www.github.com/pwnjester)  
-[Nike](https://www.github.com/N1ke-t4)
+[Nike](https://www.github.com/N1ke-t4)  
+[Rite](https://www.github.com/R1te-t4)
