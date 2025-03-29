@@ -236,7 +236,7 @@ size_t VirtualToPhysicalL(uint64_t *pagedir, size_t virt_addr) {
   uint32_t pt_index = PTE(virt_addr);
 
   spinlockCntReadAcquire(&WLOCK_PAGING);
-  if (!(globalPagedir[pml4_index] & PF_PRESENT))
+  if (!(pagedir[pml4_index] & PF_PRESENT))
     goto error;
   /*else if (pagedir[pml4_index] & PF_PRESENT &&
            pagedir[pml4_index] & PF_PS)
