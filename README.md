@@ -44,5 +44,5 @@ No! The tivOS kernel does not share source code or headers with Linux. The Linux
 This project is licensed under GPL v3 (GNU General Public License v3.0). For more information go to the [LICENSE](LICENSE) file.
 
 ## Related repos (from pwnjester)
-[tivOS packaging system](https://github.com/pwnjester/tiv-repo)
-[tivOS package manager](https://github.com/pwnjester/tiv-pkg)
+[tiv-repo](https://github.com/pwnjester/tiv-repo) tivOS packaging system  
+[tiv-pkg](https://github.com/pwnjester/tiv-pkg) tivOS package manager  
