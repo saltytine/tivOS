@@ -16,7 +16,6 @@
 #define SCHEDULE_DEBUG 0
 
 extern TSSPtr *tssPtr;
-extern void    asm_finalize_sched(uint64_t rsp, uint64_t cr3, Task *old);
 
 void schedule(uint64_t rsp) {
   if (!tasksInitiated)
@@ -58,7 +57,13 @@ void schedule(uint64_t rsp) {
 #endif
 
   // Before doing anything, handle any signals
-  signalsPendingHandle(next);
+  if (!next->kernel_task && !(next->registers.cs & GDT_KERNEL_CODE)) {
+    signalsPendingHandleSched(next);
+    if (next->state == TASK_STATE_SIGKILLED) { // killed in the process
+      currentTask = old;
+      return schedule(rsp);
+    }
+  }
 
   // Change TSS rsp0 (software multitasking)
   tssPtr->rsp0 = next->whileTssRsp;
@@ -111,5 +116,5 @@ void schedule(uint64_t rsp) {
       next->pagedirOverride ? next->pagedirOverride : next->infoPd->pagedir;
   ChangePageDirectoryFake(pagedir);
   // ^ just for globalPagedir to update (note potential race cond)
-  asm_finalize_sched((size_t)iretqRsp, VirtualToPhysical((size_t)pagedir), old);
+  asm_finalize((size_t)iretqRsp, VirtualToPhysical((size_t)pagedir));
 }
