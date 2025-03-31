@@ -1,20 +1,15 @@
 ; ISR assembly calls
+; Copyright (C) 2024 Panagiotis
 
 bits    64
 
-global asm_finalize_sched
-asm_finalize_sched:
+global asm_finalize
+asm_finalize:
   ; rdi = switch stack pointer
   ; rsi = next pagedir
-  ; rdx = old task pointer (for cleanup)
 
   mov rsp, rdi
   mov cr3, rsi
-
-  ; cleanup (WILL check task state, dw)
-  ; mov rdi, rdx
-  ; extern taskKillCleanup
-  ; call taskKillCleanup
 
   pop rbp
   ; mov ds, ebp
