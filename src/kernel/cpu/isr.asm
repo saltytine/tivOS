@@ -1,5 +1,4 @@
 ; ISR assembly calls
-; Copyright (C) 2024 Panagiotis
 
 bits    64
 
