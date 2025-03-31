@@ -169,7 +169,7 @@ void signalsPendingHandleSys(void *taskPtr, uint64_t *rsp,
   if (signal == -1) // continue as per usual
     return;
 
-  signalHitf("--- %ld [signals] %s hit (%d:sys) ---\n", task->id,
+  dbgSigHitf("--- %ld [signals] %s hit (%d:sys) ---\n", task->id,
              signalStr(signal), signal);
 
   struct sigaction *action = &task->infoSignals->signals[signal];
@@ -179,7 +179,7 @@ void signalsPendingHandleSys(void *taskPtr, uint64_t *rsp,
     switch (signalInternalDecisions[signal]) {
     case SIGNAL_INTERNAL_CORE:
     case SIGNAL_INTERNAL_TERM:
-      signalHitf("--- %ld [signals] Killing! ---\n", task->id);
+      dbgSigHitf("--- %ld [signals] Killing! ---\n", task->id);
       taskKill(task->id, 128 + signal);
       break;
     case SIGNAL_INTERNAL_IGN:
@@ -196,7 +196,7 @@ void signalsPendingHandleSys(void *taskPtr, uint64_t *rsp,
   }
 
   if (handler == SIG_IGN) {
-    signalHitf("--- %ld [signals] ignored! ---\n", task->id);
+    dbgSigHitf("--- %ld [signals] ignored! ---\n", task->id);
     atomicBitmapClear(&task->sigPendingList, signal);
     return;
   }
@@ -256,7 +256,7 @@ void signalsPendingHandleSched(void *taskPtr) {
   if (signal == -1) // continue as per usual
     return;
 
-  signalHitf("--- %ld [signals] %s hit (%d:sched) ---\n", task->id,
+  dbgSigHitf("--- %ld [signals] %s hit (%d:sched) ---\n", task->id,
              signalStr(signal), signal);
 
   struct sigaction *action = &task->infoSignals->signals[signal];
@@ -266,7 +266,7 @@ void signalsPendingHandleSched(void *taskPtr) {
     switch (signalInternalDecisions[signal]) {
     case SIGNAL_INTERNAL_CORE:
     case SIGNAL_INTERNAL_TERM:
-      signalHitf("--- %ld [signals] Killing! ---\n", task->id);
+      dbgSigHitf("--- %ld [signals] Killing! ---\n", task->id);
       task->tmpRecV = signal;
       task->state = TASK_STATE_SIGKILLED;
       handler = SIG_IGN;
@@ -286,7 +286,7 @@ void signalsPendingHandleSched(void *taskPtr) {
   }
 
   if (handler == SIG_IGN) {
-    signalHitf("--- %ld [signals] ignored! ---\n", task->id);
+    dbgSigHitf("--- %ld [signals] ignored! ---\n", task->id);
     atomicBitmapClear(&task->sigPendingList, signal);
     return;
   }
