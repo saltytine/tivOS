@@ -47,16 +47,6 @@ void helperReaper() {
     // free info splits
     taskInfoFsDiscard(reaperTask->infoFs);
 
-    // weird queue spinlock thing
-    spinlockAcquire(&LOCK_SPINLOCK_QUEUE);
-    if (reaperTask->spinlockQueueEntry) {
-      SpinlockHelperQueue *entry = reaperTask->spinlockQueueEntry;
-      if (entry->valid) // do it here
-        spinlockRelease(entry->target);
-      entry->valid = false;
-    }
-    spinlockRelease(&LOCK_SPINLOCK_QUEUE);
-
     // interrupted syscalls
     TaskSysInterrupted *intrBrowse = reaperTask->firstSysIntr;
     while (intrBrowse) {
@@ -80,25 +70,9 @@ end:
   spinlockRelease(&LOCK_REAPER);
 }
 
-SpinlockHelperQueue spinlockHelperQueue[MAX_SPINLOCK_QUEUE] = {0};
-
-void helperSpinlock() {
-  spinlockAcquire(&LOCK_SPINLOCK_QUEUE);
-  for (int i = 0; i < MAX_SPINLOCK_QUEUE; i++) {
-    if (!spinlockHelperQueue[i].valid ||
-        spinlockHelperQueue[i].task->state == TASK_STATE_READY)
-      continue;
-    spinlockRelease(spinlockHelperQueue[i].target);
-    spinlockHelperQueue[i].task->spinlockQueueEntry = 0;
-    spinlockHelperQueue[i].valid = false;
-  }
-  spinlockRelease(&LOCK_SPINLOCK_QUEUE);
-}
-
 void kernelHelpEntry() {
   while (true) {
     helperNet();
-    helperSpinlock();
     helperReaper();
 
     handControl();
