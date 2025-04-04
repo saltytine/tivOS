@@ -195,6 +195,7 @@ void taskKill(uint32_t id, uint16_t ret) {
          task->parent->waitingForPid == task->id))
       task->parent->state = TASK_STATE_READY;
     spinlockRelease(&task->parent->LOCK_CHILD_TERM);
+    atomicBitmapSet(&task->parent->sigPendingList, SIGCHLD);
   }
 
   // vfork() children need to notify parents no matter what
@@ -495,19 +496,7 @@ void taskUnblock(Blocking *blocking) {
 // Will release lock when task isn't running via the kernel helper
 void taskSpinlockExit(Task *task, Spinlock *lock) {
   assert(!task->spinlockQueueEntry);
-  spinlockAcquire(&LOCK_SPINLOCK_QUEUE);
-  for (int i = 0; i < MAX_SPINLOCK_QUEUE; i++) {
-    if (!spinlockHelperQueue[i].valid) {
-      spinlockHelperQueue[i].target = lock;
-      spinlockHelperQueue[i].task = task;
-      spinlockHelperQueue[i].valid = true;
-      spinlockRelease(&LOCK_SPINLOCK_QUEUE);
-      return;
-    }
-  }
-
-  debugf("[task::spinlock_exit] FATAL! Could not find a slot!\n");
-  panic();
+  task->spinlockQueueEntry = lock;
 }
 
 void kernelDummyEntry() {
