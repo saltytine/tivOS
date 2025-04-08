@@ -71,7 +71,7 @@ size_t unixSocketAcceptRecvfrom(OpenFile *fd, uint8_t *out, size_t limit,
 
   UnixSocketPair *pair = fd->dir;
   if (!pair->clientFds && pair->serverBuffPos == 0)
-    return ERR(ENOTCONN);
+    return 0;
   while (true) {
     spinlockAcquire(&pair->LOCK_PAIR);
     if (!pair->clientFds && pair->serverBuffPos == 0) {
@@ -105,9 +105,12 @@ size_t unixSocketAcceptSendto(OpenFile *fd, uint8_t *in, size_t limit,
 
   UnixSocketPair *pair = fd->dir;
   if (!pair->clientFds)
-    return ERR(ENOTCONN);
-  if (limit > pair->clientBuffSize)
+    return 0; // SIGPIPE thing, check pipe.c
+  if (limit > pair->clientBuffSize) {
+    debugf("[socket] Warning! Truncating limit{%ld} to clientBuffSize{%ld}\n",
+           limit, pair->clientBuffSize);
     limit = pair->clientBuffSize;
+  }
 
   while (true) {
     spinlockAcquire(&pair->LOCK_PAIR);
@@ -406,6 +409,11 @@ bool unixSocketDuplicate(OpenFile *original, OpenFile *orphan) {
   UnixSocket *unixSocket = original->dir;
   spinlockAcquire(&unixSocket->LOCK_SOCK);
   unixSocket->timesOpened++;
+  if (unixSocket->pair) {
+    spinlockAcquire(&unixSocket->pair->LOCK_PAIR);
+    unixSocket->pair->clientFds++;
+    spinlockRelease(&unixSocket->pair->LOCK_PAIR);
+  }
   spinlockRelease(&unixSocket->LOCK_SOCK);
 
   return true;
@@ -415,6 +423,14 @@ bool unixSocketClose(OpenFile *fd) {
   UnixSocket *unixSocket = fd->dir;
   spinlockAcquire(&unixSocket->LOCK_SOCK);
   unixSocket->timesOpened--;
+  if (unixSocket->pair) {
+    spinlockAcquire(&unixSocket->pair->LOCK_PAIR);
+    unixSocket->pair->clientFds--;
+    if (!unixSocket->pair->clientFds && !unixSocket->pair->serverFds)
+      unixSocketFreePair(unixSocket->pair);
+    else
+      spinlockRelease(&unixSocket->pair->LOCK_PAIR);
+  }
   if (unixSocket->timesOpened == 0) {
     // destroy it
     spinlockAcquire(&LOCK_LL_UNIX_SOCKET);
@@ -434,8 +450,10 @@ size_t unixSocketRecvfrom(OpenFile *fd, uint8_t *out, size_t limit, int flags,
 
   UnixSocket     *socket = fd->dir;
   UnixSocketPair *pair = socket->pair;
-  if (!pair || (!pair->serverFds && pair->clientBuffPos == 0))
+  if (!pair)
     return ERR(ENOTCONN);
+  if (!pair->serverFds && pair->clientBuffPos == 0)
+    return 0;
   while (true) {
     spinlockAcquire(&pair->LOCK_PAIR);
     if (!pair->serverFds && pair->clientBuffPos == 0) {
@@ -470,9 +488,12 @@ size_t unixSocketSendto(OpenFile *fd, uint8_t *in, size_t limit, int flags,
   UnixSocket     *socket = fd->dir;
   UnixSocketPair *pair = socket->pair;
   if (!pair || !pair->serverFds)
-    return ERR(ENOTCONN);
-  if (limit > pair->serverBuffSize)
+    return ERR(ENOTCONN); // todo: SIGPIPE/EPIPE
+  if (limit > pair->serverBuffSize) {
+    debugf("[socket] Warning! Truncating limit{%ld} to serverBuffSize{%ld}\n",
+           limit, pair->serverBuffSize);
     limit = pair->serverBuffSize;
+  }
 
   while (true) {
     spinlockAcquire(&pair->LOCK_PAIR);
@@ -608,6 +629,8 @@ size_t unixSocketPair(int type, int protocol, int *sv) {
   // finish it off
   sv[0] = sock1Fd->id;
   sv[1] = sock2Fd->id;
+
+  dbgSysExtraf("fds{%d, %d}", sv[0], sv[1]);
   return 0;
 }
 
