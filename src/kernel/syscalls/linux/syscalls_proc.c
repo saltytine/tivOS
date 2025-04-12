@@ -1,392 +1,99 @@
-#include <bootloader.h>
-#include <elf.h>
-#include <linked_list.h>
 #include <linux.h>
-#include <malloc.h>
-#include <string.h>
 #include <syscalls.h>
 #include <system.h>
 #include <task.h>
+#include <timer.h>
 #include <util.h>
 
-// process lifetime system calls (send help)
+#define SYSCALL_NANOSLEEP 35
+static int syscallNanosleep(struct timespec *duration, struct timespec *rem) {
+  dbgSysExtraf("sec{%ld} nsec{%ld}", duration->tv_sec, duration->tv_nsec);
+  if (duration->tv_sec < 0)
+    return -EINVAL;
 
-#define SYSCALL_PIPE 22
-static size_t syscallPipe(int *fds) { return pipeOpen(fds); }
-
-#define SYSCALL_PIPE2 293
-static size_t syscallPipe2(int *fds, int flags) {
-  if (flags && flags != O_CLOEXEC) {
-    dbgSysStubf("todo flags");
-    return ERR(ENOSYS);
-  }
-
-  size_t out = pipeOpen(fds);
-  if (out < 0)
-    goto cleanup;
-
-  if (flags) {
-    // since basically the only one we support atm is the close-on-exec flag xd
-    OpenFile *fd0 = fsUserGetNode(currentTask, fds[0]);
-    OpenFile *fd1 = fsUserGetNode(currentTask, fds[1]);
-
-    if (!fd0 || !fd1) {
-      debugf("[syscalls::pipe2] Bad sync!\n");
-      panic();
-    }
-
-    fd0->closeOnExec = true;
-    fd1->closeOnExec = true;
-  }
-
-cleanup:
-  return out;
-}
-
-#define SYSCALL_CLONE 56
-static size_t syscallClone(uint64_t flags, uint64_t newsp, int *parent_tid,
-                           int *child_tid, uint64_t tls) {
-  // 17 is SIGCHLD which we ignore
-  // CLONE_DETACHED, CLONE_SYSVSEM(*) are also ignored
-  uint64_t supported_flags =
-      CLONE_VFORK | CLONE_VM | CLONE_FILES | CLONE_SYSVSEM |
-      CLONE_CHILD_CLEARTID | CLONE_PARENT_SETTID | CLONE_DETACHED |
-      CLONE_THREAD | CLONE_SETTLS | CLONE_FS | CLONE_SIGHAND | 17;
-  if ((flags & ~supported_flags) != 0) {
-    dbgSysStubf("todo more flags %lx", (flags & ~supported_flags));
-    return ERR(ENOSYS);
-  }
-
-  Task *newTask =
-      taskFork(currentTask->syscallRegs,
-               newsp ? newsp : currentTask->syscallRsp, flags, false);
-  uint64_t id = newTask->id;
-
-  if (flags & CLONE_SETTLS)
-    newTask->fsbase = tls;
-
-  if (flags & CLONE_CHILD_CLEARTID)
-    newTask->tidptr = child_tid;
-
-  if (flags & CLONE_PARENT_SETTID)
-    *parent_tid = newTask->id;
-
-  // no race condition today :")
-  taskCreateFinish(newTask);
-
-  // potential race condition here and on the respective one below
-  if (flags & CLONE_VFORK) {
-    currentTask->state = TASK_STATE_WAITING_VFORK;
+  size_t ms = duration->tv_sec * 1000 + duration->tv_nsec / 1000000;
+  currentTask->sleepUntil = timerTicks + ms;
+  while (currentTask->sleepUntil > timerTicks) {
+    // optimized on the scheduler but yk
     handControl();
   }
 
-  return id;
+  currentTask->sleepUntil = 0; // reset to not strain the scheduler
+  return 0;
 }
 
-#define SYSCALL_FORK 57
-static size_t syscallFork() {
-  return taskFork(currentTask->syscallRegs, currentTask->syscallRsp, 0, true)
-      ->id;
+void ms_to_timeval(uint64_t ms, timeval *tv) {
+  tv->tv_sec = ms / 1000;
+  tv->tv_usec = (ms % 1000) * 1000;
 }
 
-#define SYSCALL_VFORK 58
-static size_t syscallVfork() {
-  Task *newTask = taskFork(currentTask->syscallRegs, currentTask->syscallRsp,
-                           CLONE_VM, false);
-  int   id = newTask->id;
-
-  // no race condition today :")
-  taskCreateFinish(newTask);
-
-  currentTask->state = TASK_STATE_WAITING_VFORK;
-  handControl();
-
-  return id;
+uint64_t timeval_to_ms(struct timeval tv) {
+  return (uint64_t)tv.tv_sec * 1000 + DivRoundUp(tv.tv_usec, 1000);
 }
 
-typedef struct CopyPtrStyle {
-  int      count;
-  char   **ptrPlace;
-  uint8_t *valPlace;
-} CopyPtrStyle;
-
-CopyPtrStyle copyPtrStyle(char **ptr) {
-  int    count = 0;
-  size_t totalLen = 0;
-  while (ptr[count]) {
-    totalLen += strlength(ptr[count]) + 1;
-    count++;
+#define SYSCALL_SETITIMER 38
+static size_t syscallSetitimer(int which, struct itimerval *value,
+                               struct itimerval *old) {
+  if (which != 0) { // only ITIMER_REAL supported
+    dbgSysFailf("todo other than ITIMER_REAL");
+    return ERR(ENOSYS);
   }
-  char   **ptrPlace = malloc(count * sizeof(void *));
-  uint8_t *valPlace = malloc(totalLen);
-  size_t   curr = 0;
-  for (int i = 0; i < count; i++) {
-    ptrPlace[i] = (void *)((size_t)valPlace + curr);
-    curr += strlength(ptr[i]) + 1;
-    memcpy(ptrPlace[i], ptr[i], strlength(ptr[i]) + 1);
+
+  uint64_t rtAt = atomicRead64(&currentTask->infoSignals->itimerReal.at);
+  uint64_t rtReset = atomicRead64(&currentTask->infoSignals->itimerReal.reset);
+
+  if (old) {
+    uint64_t realValue = MAX(0, rtAt - timerTicks);
+    ms_to_timeval(realValue, &old->it_value);
+    ms_to_timeval(rtReset, &old->it_interval);
   }
-  CopyPtrStyle ret = {
-      .count = count, .ptrPlace = ptrPlace, .valPlace = valPlace};
-  return ret;
+
+  if (value) {
+    uint64_t targValue = timeval_to_ms(value->it_value);
+    uint64_t targInterval = timeval_to_ms(value->it_interval);
+
+    dbgSysExtraf("val{%ld} int{%ld}", targValue, targInterval);
+
+    asm volatile("cli"); // just in case
+    atomicWrite64(&currentTask->infoSignals->itimerReal.at,
+                  timerTicks + targValue);
+    atomicWrite64(&currentTask->infoSignals->itimerReal.reset, targInterval);
+    asm volatile("sti");
+  }
+
+  return 0;
 }
 
-void freeItemsIfNeeded(char **argv) {
-  int index = 0;
-  while (argv[index]) {
-    char *backing = argv[index];
-    if (IS_INSIDE_HHDM(backing)) {
-      free(backing);
-      argv[index] = 0; // should be a fake argv, thus no userspace interference
-    }
-    index++;
+#define SYSCALL_CLOCK_GETTIME 228
+static size_t syscallClockGettime(int which, timespec *spec) {
+  switch (which) {
+  case CLOCK_MONOTONIC: // <- todo
+  case 6:               // CLOCK_MONOTONIC_COARSE
+  case 4:               // CLOCK_MONOTONIC_RAW
+  case CLOCK_REALTIME: {
+    spec->tv_sec = timerBootUnix + timerTicks / 1000;
+    size_t remainingInMs = timerTicks - (spec->tv_sec * 1000);
+    spec->tv_nsec = remainingInMs * 1000000;
+    // todo: accurancy
+    return 0;
+    break;
   }
-}
-
-void freeArgvIfNeeded(char **argv) {
-  if (IS_INSIDE_HHDM(argv)) {
-    // previous was a shebang
-    free(argv);
+  default:
+    dbgSysStubf("clock not supported\n");
+    return ERR(EINVAL);
+    break;
   }
 }
 
-#define SYSCALL_EXECVE 59
-static size_t syscallExecve(char *filename, char **argv, char **envp) {
-  assert(argv[0]); // shebang support depends on it atm. check (dep)
-  dbgSysExtraf("filename{%s}", filename);
-  spinlockAcquire(&currentTask->infoFs->LOCK_FS);
-  char *filenameSanitized = fsSanitize(currentTask->infoFs->cwd, filename);
-  spinlockRelease(&currentTask->infoFs->LOCK_FS);
-  uint8_t *buff = calloc(256, 1);
-
-  // do a read to check for alternatives, elfExecute() still does its checks
-  OpenFile *preScan = fsKernelOpen(filenameSanitized, O_RDONLY, 0);
-  if (!preScan) {
-    free(filenameSanitized);
-    return ERR(ENOENT);
-  }
-  size_t max = fsRead(preScan, buff, 255); // 1 less so there's always a \0
-  fsKernelClose(preScan);
-  if (RET_IS_ERR(max)) {
-    free(filenameSanitized);
-    return max;
-  }
-
-  if (max > 2 && buff[0] == '#' && buff[1] == '!') {
-    // shebang detected!
-    char *arg2 = (char *)0;
-    int   spaces = 0;
-    for (int i = 0; i < max; i++) {
-      if (buff[i] == ' ') {
-        if (spaces == 0) {
-          buff[i] = '\0'; // needs to be null terminated
-          arg2 = (char *)&buff[i + 1];
-        }
-        spaces++;
-      } else if (buff[i] == '\n') {
-        buff[i] = '\0'; // for the last arg (if none, 256-255=1 calloc)
-        break;          // no longer needed + don't risk above
-      }
-    }
-    int argc = 0;
-    while (argv[argc++])
-      ; // why not just pass argc. truly beyond me...
-    int    amnt = arg2 ? 2 : 1;
-    char **injectedArgv = calloc((amnt + argc + 1) * sizeof(char *), 1);
-    memcpy(&injectedArgv[amnt], argv, argc * sizeof(char *));
-    injectedArgv[amnt] = strdup(filename); // replace [0] w/original (dep)
-
-    freeArgvIfNeeded(argv); // ! don't use argv anymore
-
-    char *arg1 = (char *)&buff[2];
-    if (arg2 && arg2[0] != '\0')
-      injectedArgv[1] = strdup(arg2);
-    injectedArgv[0] = strdup(arg1);
-
-    free(buff); // ! don't use anything defined before after this
-    syscallExecve(injectedArgv[0], injectedArgv, envp);
-    assert(false); // won't return, injectedArgv & buff are above HHDM
-  } else if (max > 4 && buff[EI_MAG0] == ELFMAG0 && buff[EI_MAG1] == ELFMAG1 &&
-             buff[EI_MAG2] == ELFMAG2 && buff[EI_MAG3] == ELFMAG3) {
-    // standard elf executable, go on
-  } else {
-    // both unnecessary, won't do anything w/them :^)
-    freeItemsIfNeeded(argv); // depends on the argv so NEEDS to be first
-    freeArgvIfNeeded(argv);
-    return ERR(ENOEXEC);
-  }
-
-  CopyPtrStyle arguments = copyPtrStyle(argv);
-  CopyPtrStyle environment = copyPtrStyle(envp);
-
-  Task *ret = elfExecute(filenameSanitized, arguments.count, arguments.ptrPlace,
-                         environment.count, environment.ptrPlace, 0);
-  free(filenameSanitized);
-  free(arguments.ptrPlace);
-  free(arguments.valPlace);
-  free(environment.ptrPlace);
-  free(environment.valPlace);
-  freeItemsIfNeeded(argv); // depends on the argv so NEEDS to be first
-  freeArgvIfNeeded(argv);  // ! don't use ANY argv after this
-  if (!ret)
-    return ERR(ENOENT);
-
-  int targetId = currentTask->id;
-  currentTask->id = taskGenerateId();
-  int targetTgid = currentTask->tgid;
-  currentTask->tgid = currentTask->id; // better way to do alladat
-
-  ret->id = targetId;
-  ret->tgid = targetTgid;
-  ret->parent = currentTask->parent;
-  ret->pgid = currentTask->pgid;
-  ret->sigBlockList = currentTask->sigBlockList;
-  taskInfoFsDiscard(ret->infoFs);
-  ret->infoFs = taskInfoFsClone(currentTask->infoFs);
-  ret->infoSignals = taskInfoSignalClone(currentTask->infoSignals);
-  for (int i = 0; i < _NSIG; i++) {
-    // restore non-ignored handlers to defaults
-    if (ret->infoSignals->signals[i].sa_handler != SIG_IGN)
-      ret->infoSignals->signals[i].sa_handler = SIG_DFL;
-  }
-
-  taskFilesCopy(currentTask, ret, true);
-
-  taskCreateFinish(ret);
-
-  currentTask->noInformParent = true;
-  taskKill(currentTask->id, 0);
-  return 0; // will never be reached, it **replaces**
+#define SYSCALL_CLOCK_GETRES 229
+static size_t syscallClockGetres(int which, timespec *spec) {
+  spec->tv_nsec = 1000000; // 1ms for every clock
+  return 0;
 }
 
-#define SYSCALL_EXIT_TASK 60
-static void syscallExitTask(int return_code) {
-  // if (return_code)
-  //   panic();
-  taskKill(currentTask->id, return_code);
-}
-
-#define SYSCALL_WAIT4 61
-static size_t syscallWait4(int pid, int *wstatus, int options,
-                           struct rusage *ru) {
-  if (options || ru)
-    dbgSysStubf("todo options & rusage");
-  /*dbgSysExtraf("WNOHANG{%d} WUNTRACED{%d} "
-               "WSTOPPED{%d} WEXITED{%d} WCONTINUED{%d} "
-               "WNOWAIT{%d}",
-               options & WNOHANG, options & WUNTRACED, options & WSTOPPED,
-               options & WEXITED, options & WCONTINUED, options & WNOWAIT);*/
-
-  asm volatile("sti");
-
-  // if nothing is on the side, then ensure we have something to wait() for
-  if (!currentTask->childrenTerminatedAmnt) {
-    int amnt = 0;
-
-    spinlockCntReadAcquire(&TASK_LL_MODIFY);
-    Task *browse = firstTask;
-    while (browse) {
-      if (browse->state == TASK_STATE_READY && browse->parent == currentTask)
-        amnt++;
-      browse = browse->next;
-    }
-    spinlockCntReadRelease(&TASK_LL_MODIFY);
-
-    if (!amnt)
-      return ERR(ECHILD);
-  }
-
-  // target is the item we "found"
-  KilledInfo *target = 0;
-
-  // check if specific pid item is already there
-  if (pid != -1) {
-    spinlockAcquire(&currentTask->LOCK_CHILD_TERM);
-    KilledInfo *browse = currentTask->firstChildTerminated;
-    while (browse) {
-      if (browse->pid == pid)
-        break;
-      browse = browse->next;
-    }
-    target = browse;
-    spinlockRelease(&currentTask->LOCK_CHILD_TERM);
-
-    // not there? wait for it!
-    if (!target) {
-      if (options & WNOHANG)
-        return 0;
-      // "poll"
-      currentTask->waitingForPid = pid;
-      currentTask->state = TASK_STATE_WAITING_CHILD_SPECIFIC;
-      handControl();
-      if (signalsPendingQuick(currentTask))
-        return ERR(EINTR);
-
-      // we're back
-      currentTask->waitingForPid = 0; // just for good measure
-      spinlockAcquire(&currentTask->LOCK_CHILD_TERM);
-      KilledInfo *browse = currentTask->firstChildTerminated;
-      while (browse) {
-        if (browse->pid == pid)
-          break;
-        browse = browse->next;
-      }
-      target = browse;
-      spinlockRelease(&currentTask->LOCK_CHILD_TERM);
-    }
-  } else {
-    // todo: process group stuff! also pid vs tgid!
-    // we got children, wait for any changes
-    // OR just continue :")
-    if (!currentTask->childrenTerminatedAmnt) {
-      if (options & WNOHANG)
-        return 0;
-      currentTask->state = TASK_STATE_WAITING_CHILD;
-      handControl();
-      if (signalsPendingQuick(currentTask))
-        return ERR(EINTR);
-    }
-    target = currentTask->firstChildTerminated;
-  }
-
-  spinlockAcquire(&currentTask->LOCK_CHILD_TERM);
-  if (!target) {
-    debugf("[syscalls::wait4] FATAL Just fatal!");
-    panic();
-  }
-
-  int output = target->pid;
-  int ret = target->ret;
-
-  // cleanup
-  LinkedListRemove((void **)(&currentTask->firstChildTerminated), target);
-  currentTask->childrenTerminatedAmnt--;
-  spinlockRelease(&currentTask->LOCK_CHILD_TERM);
-
-  if (wstatus) {
-    if (ret < 128)
-      *wstatus = (ret & 0xff) << 8;
-    else {
-      int sig = ret - 128;
-      *wstatus = (sig & 0xff);
-    }
-  }
-
-  dbgSysExtraf("\n%d [RET] [syscall::wait4] pid{%d} ret{%d}", currentTask->id,
-               output, ret);
-  return output;
-}
-
-#define SYSCALL_EXIT_GROUP 231
-static void syscallExitGroup(int return_code) { syscallExitTask(return_code); }
-
-void syscallsRegProc() {
-  registerSyscall(SYSCALL_PIPE, syscallPipe);
-  registerSyscall(SYSCALL_PIPE2, syscallPipe2);
-  registerSyscall(SYSCALL_EXIT_TASK, syscallExitTask);
-  registerSyscall(SYSCALL_CLONE, syscallClone);
-  registerSyscall(SYSCALL_FORK, syscallFork);
-  registerSyscall(SYSCALL_VFORK, syscallVfork);
-  registerSyscall(SYSCALL_WAIT4, syscallWait4);
-  registerSyscall(SYSCALL_EXECVE, syscallExecve);
-  registerSyscall(SYSCALL_EXIT_GROUP, syscallExitGroup);
+void syscallsRegClock() {
+  registerSyscall(SYSCALL_NANOSLEEP, syscallNanosleep);
+  registerSyscall(SYSCALL_CLOCK_GETTIME, syscallClockGettime);
+  registerSyscall(SYSCALL_CLOCK_GETRES, syscallClockGetres);
+  registerSyscall(SYSCALL_SETITIMER, syscallSetitimer);
 }
