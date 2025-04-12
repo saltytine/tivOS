@@ -46,3 +46,6 @@ For building there are two options (although the second is mostly geared towards
 - **QEMU:** `make qemu` will launch QEMU with the recommended options on the `disk.img` disk image.
 - **VMware products:** `make vmware` will convert `disk.img` -> `disk.vmdk`.
 - **VirtualBox:** can handle the `disk.vmdk` file, so you can use the same disk image as VMware.
+
+## Common issues:
+Skill
