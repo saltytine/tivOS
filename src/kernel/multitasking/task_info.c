@@ -87,6 +87,9 @@ void taskInfoPdDiscard(TaskInfoPagedir *target) {
 TaskInfoFiles *taskInfoFilesAllocate() {
   TaskInfoFiles *target = calloc(sizeof(TaskInfoFiles), 1);
   target->utilizedBy = 1;
+  target->rlimitFdsHard = 1024;
+  target->rlimitFdsSoft = 1024;
+  target->fdBitmap = calloc(target->rlimitFdsHard / 8, 1);
   return target;
 }
 
@@ -105,6 +108,7 @@ void taskInfoFilesDiscard(TaskInfoFiles *target, void *task) {
       file = file->next;
       fsUserClose(task, id);
     }
+    free(target->fdBitmap);
     free(target);
   } else
     spinlockCntWriteRelease(&target->WLOCK_FILES);

@@ -97,6 +97,11 @@ typedef struct TaskInfoFiles {
   SpinlockCnt WLOCK_FILES;
   int         utilizedBy;
 
+  size_t rlimitFdsHard;
+  size_t rlimitFdsSoft;
+
+  uint8_t *fdBitmap;
+
   OpenFile *firstFile;
 } TaskInfoFiles;
 
