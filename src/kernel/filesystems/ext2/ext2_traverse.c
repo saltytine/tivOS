@@ -101,10 +101,10 @@ uint32_t ext2TraversePath(Ext2 *ext2, char *path, size_t initInode, bool follow,
       if (!curr || i == (len - 1))
         return curr;
 
-        if (notdir) {
-          //if by this point it's not a directory, we're fucked
-          return false
-        }
+      if (notdir) {
+        // if by this point it's not a directory, we're fucked
+        return false;
+      }
 
       lastslash = i;
     }
