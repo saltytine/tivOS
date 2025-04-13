@@ -60,6 +60,7 @@ OpenFile *fsOpenGeneric(char *filename, Task *task, int flags, int mode) {
   spinlockRelease(&task->infoFs->LOCK_FS);
 
   OpenFile *target = fsRegisterNode(task);
+  target->id = fsIdFind(task->infoFiles);
   target->mode = mode;
   target->flags = flags;
 
@@ -132,7 +133,7 @@ OpenFile *fsUserDuplicateNode(void *taskPtr, OpenFile *original) {
   TaskInfoFiles *files = task->infoFiles;
 
   OpenFile *target = fsUserDuplicateNodeUnsafe(original);
-  target->id = openId++;
+  target->id = fsIdFind(files);
 
   spinlockCntWriteAcquire(&files->WLOCK_FILES);
   LinkedListPushFrontUnsafe((void **)(&files->firstFile), target);
