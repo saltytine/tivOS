@@ -14,7 +14,7 @@ However, as you'd expect with any sort of kernel, **contributions of any sort go
   - The same applies when changing utility scripts which are executed by the build system. Test those thoroughly as well.
 - **Code familiarity:**
   - The biggest reason tivOS exists is **code simplicity**. I wanted its code to remain relatively simple while being powerful. It's easier to write tons of complex code in comparison to simpler code for the same goal. I generally prefer the latter.
-  - Please **avoid useless assembly!** Anything that isn't plain impossible to do in C (for instance interrupt/syscall entries or some scheduler parts) you shouldn't write assembly code for. It's hard for other contributors and myself to understand and there's a much greater chance of mistakes being made.
+  - Please **avoid useless assembly!** Anything that isn't plain impossible to do in C (for instance interrupt/syscall entries or some scheduler parts) you shouldn't write assembly code for. It's hard for myself and other contributors (except pwnjester, who knows everything) to understand and there's a much greater chance of mistakes being made.
   - Keep in mind that submissions can be rejected for any reason, even if they do something in a "better way". At the end of the day, **the maintainer gets to decide what makes it to the master branch**.
 
 ## Go for it
