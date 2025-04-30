@@ -104,7 +104,6 @@ void initiateVMWareSvga2(PCIdevice *device) {
   return; // todo
 
   assert(!VMWareSvga2.exists);
-  VMWareSvga2.exists = true;
 
   PCIgeneralDevice *details =
       (PCIgeneralDevice *)malloc(sizeof(PCIgeneralDevice));
@@ -154,4 +153,5 @@ void initiateVMWareSvga2(PCIdevice *device) {
 
   drawRect(0, 0, framebufferWidth, framebufferHeight, 255, 255, 0);
   VMwareSvga2Update(0, 0, framebufferWidth, framebufferHeight);
+  VMWareSvga2.exists = true;
 }
