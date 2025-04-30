@@ -8,7 +8,7 @@
 
 #include <lwip/sockets.h>
 
-// todo! fix errnos! (per Task and macro!)
+// Lwip wrapper for userland sockets
 
 size_t socketRead(OpenFile *fd, uint8_t *out, size_t limit) {
   UserSocket *userSocket = (UserSocket *)fd->dir;
