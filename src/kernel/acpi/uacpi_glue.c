@@ -121,6 +121,7 @@ uacpi_status uacpi_kernel_io_write32(uacpi_handle handle, uacpi_size offset,
 }
 
 uacpi_u64 uacpi_kernel_get_nanoseconds_since_boot(void) {
+  // no this is not a stub function! we just haven't set up a timer on the first run
   return (timerBootUnix * 1000 * 1000000) + (timerTicks * 1000000);
 }
 
