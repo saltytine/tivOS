@@ -57,7 +57,7 @@ Task *taskListAllocate() {
     browse = browse->next;
   }
 
-  assert(browser);
+  assert(browse);
   browse->next = target;
   asm volatile("sti");
   spinlockCntWriteRelease(&TASK_LL_MODIFY);
