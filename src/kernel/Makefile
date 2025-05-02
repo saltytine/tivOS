@@ -1,5 +1,5 @@
-COMPILER = ~/opt/cross/bin/x86_64-cavos-gcc
-LINKER = ~/opt/cross/bin/x86_64-cavos-ld
+COMPILER = ~/opt/cross/bin/x86_64-tivos-gcc
+LINKER = ~/opt/cross/bin/x86_64-tivos-ld
 ASSEMBLER = nasm
 # -w(no warnings) -g(dev)
 CFLAGS = -m64 -g -c -ffreestanding -Wall -Werror -fcommon -Iinclude/ -Inetworking/lwip/include/ -fPIE -mno-80387 \
@@ -21,12 +21,12 @@ LDFLAGS = -m elf_x86_64 \
     -z max-page-size=0x1000 -T link.ld
 
 TARGET = ../../target
-MOUNTPOINT = /cavosmnt
+MOUNTPOINT = /tivosmnt
 TOOLS = ../../tools
 
 TARGET_IMG = ../../disk.img
 TARGET_VMWARE = ../../disk.vmdk
-TARGET_ISO = ../../cavOS.iso
+TARGET_ISO = ../../tivOS.iso
 
 OUTPUT = $(TARGET)/boot/kernel.bin
 
