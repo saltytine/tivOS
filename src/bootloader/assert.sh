@@ -8,6 +8,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 cd "${SCRIPTPATH}"
 
 TARGET_VERSION="9.2.3"
+IMAGE_FILE="$HOME/Downloads/skibidi-toilet-porn.png"
 
 fetchLimine() {
 	rm -rf limine/
@@ -18,6 +19,14 @@ fetchLimine() {
 	echo "$TARGET_VERSION" >.version
 }
 
-if [[ ! -f ".version" ]] || ! cat .version | grep -i "$TARGET_VERSION" || [[ ! -f "limine/limine" ]]; then
+# Check if required image exists
+if [[ ! -f "$IMAGE_FILE" ]]; then
+	echo "Required image file not found at: $IMAGE_FILE"
+	echo "Aborting boot process."
+	exit 1
+fi
+
+# Proceed with Limine setup only if needed
+if [[ ! -f ".version" ]] || ! grep -qi "$TARGET_VERSION" .version || [[ ! -f "limine/limine" ]]; then
 	fetchLimine
 fi
