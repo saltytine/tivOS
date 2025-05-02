@@ -122,7 +122,7 @@ const uint8_t evdevTable[89] = {
     KEY_KP1,
     KEY_DOWN, // KEY_KP2
     KEY_KP3,
-    KEY_KP0,
+    KEY_INSERT, // KEY_KP0
     KEY_KPDELETE, // KEY_KPDOT
     0,
     0,
