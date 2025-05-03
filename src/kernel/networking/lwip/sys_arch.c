@@ -163,13 +163,13 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *q, void **msg, u32_t timeout) {
       break;
     // spinlockRelease(&q->LOCK);
     if (timeout && timerTicks >= (timeStart + timeout)) {
-      spinlockRelease(q->LOCK);
+      spinlockRelease(&q->LOCK);
       return SYS_ARCH_TIMEOUT;
     }
     if (timeout)
       currentTask->forcefulWakeupTimeUnsafe = timeStart + timeout;
     mboxBlock *block =
-      LinkedListAllocated((void **)&q->firstBlock, sizeof(mboxBlock));
+        LinkedListAllocate((void **)&q->firstBlock, sizeof(mboxBlock));
     block->task = currentTask;
     block->write = false;
     taskSpinlockExit(currentTask, &q->LOCK);
