@@ -37,10 +37,10 @@ void schedule(uint64_t rsp) {
     }
     if (next->forcefulWakeupTimeUnsafe &&
         next->forcefulWakeupTimeUnsafe <= timerTicks) {
-      //no race! the task has to already have been suspended to end up here
+      // no race! the task has to already have been suspended to end up here
       next->state = TASK_STATE_READY;
       next->forcefulWakeupTimeUnsafe = 0;
-      // ^ is here to avoid interface with future statuses
+      // ^ is here to avoid interference with future statuses
       break;
     }
     next = next->next;
