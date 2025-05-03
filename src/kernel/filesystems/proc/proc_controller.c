@@ -206,7 +206,7 @@ size_t procEachOpen(char *filename, int flags, int mode, OpenFile *fd,
     }
     pid = atoi(pidStr);
   } else
-    pid = currentTask->;
+    pid = currentTask->id;
   int opcode = 0;
   if (strEql(decisionStr, "cmdline")) {
     opcode = PROC_INTERNAL_CMDLINE;
