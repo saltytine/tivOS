@@ -246,6 +246,8 @@ static size_t syscallExecve(char *filename, char **argv, char **envp) {
   ret->tgid = targetTgid;
   ret->parent = currentTask->parent;
   ret->pgid = currentTask->pgid;
+  ret->sid = currentTask->sid;
+  ret->ctrlPty = currentTask->ctrlPty;
   ret->sigBlockList = currentTask->sigBlockList;
   taskInfoFsDiscard(ret->infoFs);
   ret->infoFs = taskInfoFsClone(currentTask->infoFs);
@@ -392,7 +394,7 @@ static size_t syscallReboot(int magic1, int magic2, uint32_t cmd, void *arg) {
   switch (cmd) {
   case LINUX_REBOOT_CMD_POWER_OFF:
     return acpiPoweroff();
-    break
+    break;
   case LINUX_REBOOT_CMD_RESTART:
     return acpiReboot();
     break;

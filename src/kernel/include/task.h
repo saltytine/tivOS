@@ -103,7 +103,7 @@ typedef struct TaskInfoFiles {
 
   uint8_t *fdBitmap;
 
-  AVLheader *firstFile; // value of  OpenFile*
+  AVLheader *firstFile; // value of OpenFile*
 } TaskInfoFiles;
 
 TaskInfoFiles *taskInfoFilesAllocate();
@@ -120,6 +120,7 @@ struct Task {
   uint64_t id;
   int      pgid;
   int      tgid;
+  int      sid;
   bool     kernel_task;
   uint8_t  state;
 
@@ -154,6 +155,7 @@ struct Task {
   termios  term;
   uint32_t tmpRecV;
   int      kernelErrno;
+  int      ctrlPty;
   void    *spinlockQueueEntry; // check on kill!
 
   char  *cmdline;
@@ -220,8 +222,8 @@ Task *taskCreateKernel(uint64_t rip, uint64_t rdi);
 void  taskNameKernel(Task *target, const char *str, int len);
 void  taskCreateFinish(Task *task);
 
-void  taskAdjustHeap(Task *task, size_t new_heap_end, size_t *start,
-                     size_t *end);
+void taskAdjustHeap(Task *task, size_t new_heap_end, size_t *start,
+                    size_t *end);
 
 Task *taskGet(uint32_t id);
 void  taskKill(uint32_t id, uint16_t ret);
@@ -229,11 +231,11 @@ void  taskFreeChildren(Task *task);
 
 size_t taskChangeCwd(char *newdir);
 Task  *taskFork(AsmPassedInterrupt *cpu, uint64_t rsp, int cloneFlags,
-               bool spinup);
+                bool spinup);
 void   taskFilesCopy(Task *original, Task *target, bool respectCOE);
 
-Task  *taskListAllocate();
-void   taskListDestroy(Task *target);
+Task *taskListAllocate();
+void  taskListDestroy(Task *target);
 
 uint64_t taskGenerateId();
 void     taskCallReaper(Task *target);
