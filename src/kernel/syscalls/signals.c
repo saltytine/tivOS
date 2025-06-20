@@ -9,6 +9,7 @@
 #include <util.h>
 
 // Signal dispatcher, generator & general utility
+// Copyright (C) 2025 Panagiotis
 
 #define currentTask (youWillNotUseThisInNoWayImaginable())
 

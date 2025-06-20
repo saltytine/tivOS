@@ -206,7 +206,7 @@ size_t fsGetFilesize(OpenFile *file) {
 }
 
 /* When using read/write, don't take the risk of using LOCK_OPERATIONS if
- * blocking is possible*/
+ * blocking is possible */
 
 size_t fsRead(OpenFile *file, uint8_t *out, uint32_t limit) {
   size_t ret = -1;
@@ -223,7 +223,7 @@ size_t fsRead(OpenFile *file, uint8_t *out, uint32_t limit) {
   ret = file->handlers->read(file, out, limit);
 cleanup:
   if (!file->handlers->internalPoll)
-    spinlockAcquire(&file->LOCK_OPERATIONS);
+    spinlockRelease(&file->LOCK_OPERATIONS);
   return ret;
 }
 
@@ -246,7 +246,7 @@ size_t fsWrite(OpenFile *file, uint8_t *in, uint32_t limit) {
   ret = file->handlers->write(file, in, limit);
 cleanup:
   if (!file->handlers->internalPoll)
-    spinlockAcquire(&file->LOCK_OPERATIONS);
+    spinlockRelease(&file->LOCK_OPERATIONS);
   return ret;
 }
 

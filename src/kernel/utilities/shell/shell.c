@@ -212,7 +212,7 @@ void launch_shell(int n) {
         continue;
       }
       size_t filesize = fsGetFilesize(dir);
-      char *out = (char *)malloc(filesize);
+      char  *out = (char *)malloc(filesize);
       fsRead(dir, (uint8_t *)out, filesize);
       fsKernelClose(dir);
       clearScreen();
@@ -265,7 +265,7 @@ void launch_shell(int n) {
       printf("\nWarning: networking is still very early in testing!\n");
       printf("=========================================\n");
       printf("==       Networking configuration      ==\n");
-      printf("==            For TIV by TIV           ==\n");
+      printf("==      Copyright MalwarePad 2024      ==\n");
       printf("=========================================\n\n");
       PCI *pci = firstPCI;
       while (pci) {
@@ -364,7 +364,7 @@ void launch_shell(int n) {
       printf("\n");
       printf("=========================================\n");
       printf("==        tivOS kernel shell 1.6       ==\n");
-      printf("==             For TIV by TIV          ==\n");
+      printf("==            For TIV by TIV           ==\n");
       printf("=========================================\n\n");
     } else if (strEql(ch, "fetch")) {
       fetch();

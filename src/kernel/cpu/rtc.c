@@ -6,8 +6,8 @@
 // most code from the excellent https://wiki.osdev.org/CMOS#The_Real-Time_Clock
 // reference
 
-// Change this each year
-#define CURRENT_YEAR 2025
+// Change this each year!
+#define CURRENT_YEAR 2024
 
 int century_register = 0x00; // Set by ACPI table parsing code if possible
 

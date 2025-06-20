@@ -2,7 +2,7 @@
 tivOS is a POSIX-compliant operating system in C. An active effort of making a full OS, with a simple and readable codebase.
 
 [![GitHub top language](https://img.shields.io/github/languages/top/saltytine/tivOS?logo=c&label=)](https://github.com/saltytine/tivOS/blob/master/src/kernel/Makefile)
-[![GitHub license](https://img.shields.io/github/license/saltytine/tivOS)](https://github.com/saltytine/cavOS/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/saltytine/tivOS)](https://github.com/saltytine/tivOS/blob/master/LICENSE)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e78ad48f394f46d1bb98f1942c7e1f21)]()
 [![GitHub contributors](https://img.shields.io/github/contributors/saltytine/tivOS)](https://github.com/saltytine/tivOS/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/saltytine/tivOS)](https://github.com/saltytine/tivOS/commits)

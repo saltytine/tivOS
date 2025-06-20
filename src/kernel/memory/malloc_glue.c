@@ -28,15 +28,15 @@ void *sbrk(long increment) {
   return virt;
 }
 
-// below aren't needed anymore as MALLOC_FAILUER_ACTION is set to abort
-/* *int __errnoF = 0;
+// below aren't needed anymore as MALLOC_FAILURE_ACTION is set to abort
+/*int  __errnoF = 0;
 int *__errno_location = &__errnoF;*/
 
 // void __errno() { return &__errnoF; }
 
 void abort() {
   debugf("[dlmalloc::abort] Either ran out of memory or there is a memory "
-          "violation! (most likely the second)\n");
+         "violation! (most likely the second)\n");
   panic();
 }
 
