@@ -21,7 +21,6 @@ const char *defaultErrStr = "unknown";
 #endif
 
 // System call entry and management-related functions
-// Copyright (C) 2024 Panagiotis
 
 size_t   syscalls[MAX_SYSCALLS] = {0};
 uint32_t syscallCnt = 0;
