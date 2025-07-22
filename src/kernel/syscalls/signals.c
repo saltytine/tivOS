@@ -13,7 +13,7 @@
 #define currentTask (youWillNotUseThisInNoWayImaginable())
 
 SignalInternal signalInternalDecisions[_NSIG] = {0};
-extern void    syscall_entry();
+extern void syscall_entry();
 
 // stack is laid out like this afterwards
 // * uint64_t retaddr;
@@ -62,7 +62,7 @@ void initiateSignalDefs() {
 }
 
 void signalsAsmPassedToUcontext(const AsmPassedInterrupt *passed,
-                                struct sigcontext        *ucontext) {
+                                struct sigcontext *ucontext) {
   ucontext->r8 = passed->r8;
   ucontext->r9 = passed->r9;
   ucontext->r10 = passed->r10;
@@ -94,7 +94,7 @@ void signalsAsmPassedToUcontext(const AsmPassedInterrupt *passed,
 }
 
 void signalsUcontextToAsmPassed(const struct sigcontext *ucontext,
-                                AsmPassedInterrupt      *passed) {
+                                AsmPassedInterrupt *passed) {
   passed->r8 = ucontext->r8;
   passed->r9 = ucontext->r9;
   passed->r10 = ucontext->r10;
@@ -128,7 +128,9 @@ void signalsUcontextToAsmPassed(const struct sigcontext *ucontext,
 
 // fast function to tell if a signal is pending (for constant-pull syscalls)
 bool signalsPendingQuick(void *taskPtr) {
-  Task    *task = (Task *)taskPtr;
+  Task *task = (Task *)taskPtr;
+  if (task->kernel_task)
+    return false;
   sigset_t pendingList = atomicBitmapGet(&task->sigPendingList);
   sigset_t unblockedList = pendingList & ~task->sigBlockList;
   for (int i = 0; i < _NSIG; i++) {
@@ -136,7 +138,7 @@ bool signalsPendingQuick(void *taskPtr) {
     if (!bitmapGenericGet((uint8_t *)&unblockedList, i))
       continue;
     struct sigaction *action = &task->infoSignals->signals[i];
-    __sighandler_t    userHandler =
+    __sighandler_t userHandler =
         (__sighandler_t)atomicRead64((size_t *)(size_t)&action->sa_handler);
     if (userHandler == SIG_IGN)
       continue;
@@ -184,7 +186,7 @@ void signalsPendingHandleSys(void *taskPtr, uint64_t *rsp,
              signalStr(signal), signal);
 
   struct sigaction *action = &task->infoSignals->signals[signal];
-  __sighandler_t    handler =
+  __sighandler_t handler =
       (__sighandler_t)atomicRead64((size_t *)(size_t)&action->sa_handler);
   if (handler == SIG_DFL) {
     switch (signalInternalDecisions[signal]) {
@@ -273,7 +275,7 @@ void signalsPendingHandleSched(void *taskPtr) {
              signalStr(signal), signal);
 
   struct sigaction *action = &task->infoSignals->signals[signal];
-  __sighandler_t    handler =
+  __sighandler_t handler =
       (__sighandler_t)atomicRead64((size_t *)(size_t)&action->sa_handler);
   if (handler == SIG_DFL) {
     switch (signalInternalDecisions[signal]) {
@@ -336,7 +338,7 @@ void signalsPendingHandleSched(void *taskPtr) {
   assert(regionPhys);
 
   // make a region which we access by it's end (max 4KiB // PAGE_SIZE)
-  int    top = PAGE_SIZE;
+  int top = PAGE_SIZE;
   size_t region = bootloader.hhdmOffset + regionPhys;
 
   top -= sizeof(struct fpstate);
@@ -376,8 +378,8 @@ size_t signalsSigreturnSyscall(void *taskPtr) {
 
   // return ptr has already been pushed
   struct sigcontext *ucontext = (struct sigcontext *)saveStackBrowse;
-  int                signal = ucontext->reserved1[0];
-  struct sigaction  *action = &task->infoSignals->signals[signal];
+  int signal = ucontext->reserved1[0];
+  struct sigaction *action = &task->infoSignals->signals[signal];
 
   int flags = atomicRead64(&action->sa_flags);
 
