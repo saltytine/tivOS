@@ -251,6 +251,9 @@ Task *elfExecute(char *filepath, uint32_t argc, char **argv, uint32_t envc,
   // Just a sane default
   target->parent = currentTask;
 
+  if (strEql(filepath, "/usr/bin/ClassiCube"))
+    target->extras |= EXTRAS_DISABLE_FUTEX;
+
   if (startup)
     taskCreateFinish(target);
 
