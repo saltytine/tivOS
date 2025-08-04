@@ -103,7 +103,7 @@ static size_t syscallKill(int pid, int sig) {
     return ERR(EINVAL);
 
   if (sig >= SIGRTMIN) {
-    dbgSigStubf("todo real-time signals");
+    dbgSysStubf("todo real-time signals");
     // dbgSigStubf("[signals::kill] Todo real-time signals!\n");
     // return ERR(ENOSYS);
   }
@@ -171,7 +171,7 @@ static size_t syscallTkill(int pid, int sig) {
   spinlockCntReadRelease(&TASK_LL_MODIFY);
   if (!target || target->state == TASK_STATE_DEAD)
     return ERR(ESRCH);
-  atomicBitmapSet(*target->sigPendingList, sig);
+  atomicBitmapSet(&target->sigPendingList, sig);
   return 0;
 }
 

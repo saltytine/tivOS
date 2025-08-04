@@ -126,15 +126,17 @@ void sysSetupPci(FakefsFile *devices) {
   free(out);
 }
 
-size_t tivosConsoleWrite(OpenFile *fd, uint8_t * buff, size_t len) {
-  size_t i = len -1; // only index we care about
+// todo: extremely janky system (not considering TTYs like I should) but should
+// work for xorg
+size_t tivosConsoleWrite(OpenFile *fd, uint8_t *buff, size_t len) {
+  size_t i = len - 1; // only index we care about
   if (buff[i] == 'd')
     consoleDisabled = true;
   else if (buff[i] == 'e')
     consoleDisabled = false;
   return len;
 }
-VfsHandlers tivosConsoleHandlers = {.write tivosConsoleWrite};
+VfsHandlers tivosConsoleHandlers = {.write = tivosConsoleWrite};
 
 void sysSetup() {
   fakefsAddFile(&rootSys, rootSys.rootFile, "tivosConsole", 0,

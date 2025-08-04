@@ -157,7 +157,7 @@ size_t unixSocketAcceptGetpeername(OpenFile *fd, sockaddr_linux *addr,
   UnixSocketPair *pair = fd->dir;
   if (!pair)
     return ERR(ENOTCONN);
-  
+
   int actualLen = sizeof(addr->sa_family) + strlength(pair->filename);
   int toCopy = MIN(*len, actualLen);
   if (toCopy < sizeof(addr->sa_family)) // you're POOR!
