@@ -2,6 +2,7 @@
 > First off, I'm flattered you're willing to help with tivOS' development! So, thank you in advance for that :)
 
 However, as you'd expect with any sort of kernel, **contributions of any sort go through a lot of auditing.** That also takes a lot of time, so please be patient as your submission is reviewed.
+I am returning to school soon, so I will be less able to review pull requests, so bare with.
 
 ## Requirements
 - **Proper code formatting:** 
