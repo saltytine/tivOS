@@ -265,7 +265,6 @@ void launch_shell(int n) {
       printf("\nWarning: networking is still very early in testing!\n");
       printf("=========================================\n");
       printf("==       Networking configuration      ==\n");
-      printf("==      Copyright MalwarePad 2024      ==\n");
       printf("=========================================\n\n");
       PCI *pci = firstPCI;
       while (pci) {
