@@ -6,6 +6,8 @@
 #include <fb.h>
 #include <syscalls.h>
 
+#include <console.h>
+
 Fakefs rootSys = {0};
 
 typedef struct PciConf {
@@ -124,7 +126,20 @@ void sysSetupPci(FakefsFile *devices) {
   free(out);
 }
 
+size_t tivosConsoleWrite(OpenFile *fd, uint8_t * buff, size_t len) {
+  size_t i = len -1; // only index we care about
+  if (buff[i] == 'd')
+    consoleDisabled = true;
+  else if (buff[i] == 'e')
+    consoleDisabled = false;
+  return len;
+}
+VfsHandlers tivosConsoleHandlers = {.write tivosConsoleWrite};
+
 void sysSetup() {
+  fakefsAddFile(&rootSys, rootSys.rootFile, "tivosConsole", 0,
+                S_IFLNK | S_IRUSR | S_IFREG, &tivosConsoleHandlers);
+
   FakefsFile *bus =
       fakefsAddFile(&rootSys, rootSys.rootFile, "bus", 0,
                     S_IFDIR | S_IRUSR | S_IWUSR, &fakefsRootHandlers);
