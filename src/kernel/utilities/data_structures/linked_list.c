@@ -84,6 +84,7 @@ bool LinkedListDuplicate(void **LLfirstPtrSource, void **LLfirstPtrTarget,
 
 void LinkedListPushFrontUnsafe(void **LLfirstPtr, void *LLtarget) {
   if (*LLfirstPtr == 0) {
+    // todo: zero next (checks)
     *LLfirstPtr = LLtarget;
     return;
   }
