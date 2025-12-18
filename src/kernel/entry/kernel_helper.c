@@ -86,6 +86,7 @@ void helperVolatilePoll() {
       pollInstanceRing((size_t)&devInputEvents[i], EPOLLIN);
   }
 }
+
 void kernelHelpEntry() {
   while (true) {
     helperNet();
