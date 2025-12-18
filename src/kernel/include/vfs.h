@@ -86,6 +86,8 @@ typedef size_t (*SpecialGetpeername)(OpenFile *fd, sockaddr_linux *addr,
                                      uint32_t *len);
 typedef size_t (*SpecialRecvMsg)(OpenFile *fd, struct msghdr_linux *msg,
                                  int flags);
+typedef size_t (*SpecialSendMsg)(OpenFile *fd, struct msghdr_linux *msg,
+                                 int flags);
 typedef size_t (*SpecialSendto)(OpenFile *fd, uint8_t *in, size_t limit,
                                 int flags, sockaddr_linux *addr, uint32_t len);
 typedef int (*SpecialInternalPoll)(OpenFile *fd, int events);
@@ -112,6 +114,7 @@ typedef struct VfsHandlers {
   SpecialRecvfrom    recvfrom;
   SpecialSendto      sendto;
   SpecialRecvMsg     recvmsg;
+  SpecialSendMsg     sendmsg;
   SpecialGetsockname getsockname;
   SpecialGetsockopts getsockopts;
   SpecialGetpeername getpeername;
@@ -168,12 +171,12 @@ struct MountPoint {
   void         *fsInfo;
 };
 
-/* typedef struct PollItem {
+/*typedef struct PollItem {
   struct PollItem *next;
 
   int   epollEvents;
   void *task; // Task*
-} PollItem; */
+} PollItem;*/
 
 #define VFS_CLOSE_FLAG_RETAIN_ID (1 << 0)
 struct OpenFile {
