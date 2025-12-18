@@ -3,6 +3,7 @@
 #include <fb.h>
 #include <linked_list.h>
 #include <malloc.h>
+#include <poll.h>
 #include <string.h>
 #include <syscalls.h>
 #include <task.h>
@@ -158,6 +159,7 @@ size_t ptmxRead(OpenFile *fd, uint8_t *out, size_t limit) {
   pair->ptrMaster -= toCopy;
 
   spinlockRelease(&pair->LOCK_PTY);
+  pollInstanceRing((size_t)pair, EPOLLOUT);
   return toCopy;
 }
 
@@ -200,6 +202,7 @@ size_t ptmxWrite(OpenFile *fd, uint8_t *in, size_t limit) {
   // hexDump("fr", in, limit, 32, debugf);
 
   spinlockRelease(&pair->LOCK_PTY);
+  pollInstanceRing((size_t)pair, EPOLLIN);
   return limit;
 }
 
@@ -256,12 +259,15 @@ int ptmxInternalPoll(OpenFile *fd, int events) {
   return revents;
 }
 
+size_t ptmxReportKey(OpenFile *fd) { return (size_t)fd->dir; }
+
 VfsHandlers handlePtmx = {.open = ptmxOpen,
                           .duplicate = ptmxDuplicate,
                           .close = ptmxClose,
                           .read = ptmxRead,
                           .write = ptmxWrite,
                           .internalPoll = ptmxInternalPoll,
+                          .reportKey = ptmxReportKey,
                           .ioctl = ptmxIoctl};
 
 void ptsCtrlAssign(PtyPair *pair) {
@@ -377,6 +383,7 @@ size_t ptsRead(OpenFile *fd, uint8_t *out, size_t limit) {
   pair->ptrSlave -= toCopy;
 
   spinlockRelease(&pair->LOCK_PTY);
+  pollInstanceRing((size_t)pair, EPOLLOUT);
   return toCopy;
 }
 
@@ -426,6 +433,7 @@ size_t ptsWrite(OpenFile *fd, uint8_t *in, size_t limit) {
   size_t written = ptsWriteInner(pair, in, limit);
 
   spinlockRelease(&pair->LOCK_PTY);
+  pollInstanceRing((size_t)pair, EPOLLIN);
   return written;
 }
 
@@ -497,6 +505,8 @@ int ptsInternalPoll(OpenFile *fd, int events) {
   return revents;
 }
 
+size_t ptsReportKey(OpenFile *fd) { return (size_t)fd->dir; }
+
 VfsHandlers handlePts = {.open = ptsOpen,
                          .duplicate = ptsDuplicate,
                          .close = ptsClose,
@@ -504,4 +514,5 @@ VfsHandlers handlePts = {.open = ptsOpen,
                          .write = ptsWrite,
                          .internalPoll = ptsInternalPoll,
                          .ioctl = ptsIoctl,
+                         .reportKey = ptsReportKey,
                          .stat = fakefsFstat};

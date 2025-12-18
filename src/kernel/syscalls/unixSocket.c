@@ -1,5 +1,6 @@
 #include <linked_list.h>
 #include <malloc.h>
+#include <poll.h>
 #include <syscalls.h>
 #include <task.h>
 #include <unixSocket.h>
@@ -54,10 +55,15 @@ bool unixSocketAcceptClose(OpenFile *fd) {
   spinlockAcquire(&pair->LOCK_PAIR);
   pair->serverFds--;
 
+  bool notify = pair->serverFds == 0;
+
   if (pair->serverFds == 0 && pair->clientFds == 0)
     unixSocketFreePair(pair);
   else
     spinlockRelease(&pair->LOCK_PAIR);
+
+  if (notify)
+    pollInstanceRing((size_t)pair, EPOLLHUP);
 
   return true;
 }
@@ -92,7 +98,11 @@ size_t unixSocketAcceptRecvfrom(OpenFile *fd, uint8_t *out, size_t limit,
   memmove(pair->serverBuff, &pair->serverBuff[toCopy],
           pair->serverBuffPos - toCopy);
   pair->serverBuffPos -= toCopy;
+  bool notify =
+      (pair->serverBuffPos + UNIX_SOCK_POLL_EXTRA) < pair->serverBuffSize;
   spinlockRelease(&pair->LOCK_PAIR);
+  if (notify)
+    pollInstanceRing((size_t)pair, EPOLLOUT);
 
   return toCopy;
 }
@@ -129,6 +139,7 @@ size_t unixSocketAcceptSendto(OpenFile *fd, uint8_t *in, size_t limit,
   memcpy(&pair->clientBuff[pair->clientBuffPos], in, limit);
   pair->clientBuffPos += limit;
   spinlockRelease(&pair->LOCK_PAIR);
+  pollInstanceRing((size_t)pair, EPOLLIN);
 
   return limit;
 }
@@ -151,6 +162,8 @@ int unixSocketAcceptInternalPoll(OpenFile *fd, int events) {
 
   return revents;
 }
+
+size_t unixSocketAcceptReportKey(OpenFile *fd) { return (size_t)fd->dir; }
 
 size_t unixSocketAcceptGetpeername(OpenFile *fd, sockaddr_linux *addr,
                                    uint32_t *len) {
@@ -404,6 +417,8 @@ size_t unixSocketConnect(OpenFile *fd, sockaddr_linux *addr, uint32_t len) {
   pair->clientFds = 1;
   parent->backlog[parent->connCurr++] = pair;
   spinlockRelease(&parent->LOCK_SOCK);
+  pollInstanceRing((size_t)parent, EPOLLIN);
+  pollInstanceRing((size_t)pair, EPOLLIN);
 
   // todo!
   assert(!(fd->flags & O_NONBLOCK));
@@ -439,9 +454,12 @@ bool unixSocketClose(OpenFile *fd) {
   UnixSocket *unixSocket = fd->dir;
   spinlockAcquire(&unixSocket->LOCK_SOCK);
   unixSocket->timesOpened--;
+  size_t keyToNotify = 0;
   if (unixSocket->pair) {
     spinlockAcquire(&unixSocket->pair->LOCK_PAIR);
     unixSocket->pair->clientFds--;
+    if (unixSocket->pair->clientFds == 0)
+      keyToNotify = (size_t)unixSocket->pair;
     if (!unixSocket->pair->clientFds && !unixSocket->pair->serverFds)
       unixSocketFreePair(unixSocket->pair);
     else
@@ -452,9 +470,12 @@ bool unixSocketClose(OpenFile *fd) {
     spinlockAcquire(&LOCK_LL_UNIX_SOCKET);
     assert(LinkedListRemove((void **)&firstUnixSocket, unixSocket));
     spinlockRelease(&LOCK_LL_UNIX_SOCKET);
-    return true;
+    goto skip_release;
   }
   spinlockRelease(&unixSocket->LOCK_SOCK);
+skip_release:
+  if (keyToNotify)
+    pollInstanceRing(keyToNotify, EPOLLHUP);
   return true;
 }
 
@@ -491,6 +512,7 @@ size_t unixSocketRecvfrom(OpenFile *fd, uint8_t *out, size_t limit, int flags,
           pair->clientBuffPos - toCopy);
   pair->clientBuffPos -= toCopy;
   spinlockRelease(&pair->LOCK_PAIR);
+  pollInstanceRing((size_t)pair, EPOLLOUT);
 
   return toCopy;
 }
@@ -530,6 +552,7 @@ size_t unixSocketSendto(OpenFile *fd, uint8_t *in, size_t limit, int flags,
   memcpy(&pair->serverBuff[pair->serverBuffPos], in, limit);
   pair->serverBuffPos += limit;
   spinlockRelease(&pair->LOCK_PAIR);
+  pollInstanceRing((size_t)pair, EPOLLIN);
 
   return limit;
 }
@@ -615,6 +638,7 @@ int unixSocketInternalPoll(OpenFile *fd, int events) {
   if (socket->connMax > 0) {
     // listen()
     spinlockAcquire(&socket->LOCK_SOCK);
+    // todo: fix below
     if (socket->connCurr < socket->connMax) // can connect()
       revents |= (events & EPOLLOUT) ? EPOLLOUT : 0;
     if (socket->connCurr > 0) // can accept()
@@ -628,7 +652,7 @@ int unixSocketInternalPoll(OpenFile *fd, int events) {
       revents |= EPOLLHUP;
 
     if (events & EPOLLOUT && pair->serverFds &&
-        pair->serverBuffPos < pair->serverBuffSize)
+        (pair->serverBuffPos + UNIX_SOCK_POLL_EXTRA) < pair->serverBuffSize)
       revents |= EPOLLOUT;
 
     if (events & EPOLLIN && pair->clientBuffPos > 0)
@@ -638,6 +662,11 @@ int unixSocketInternalPoll(OpenFile *fd, int events) {
     revents |= EPOLLHUP;
 
   return revents;
+}
+
+size_t unixSocketReportKey(OpenFile *fd) {
+  UnixSocket *socket = fd->dir;
+  return socket->pair ? (size_t)socket->pair : (size_t)socket;
 }
 
 size_t unixSocketPair(int type, int protocol, int *sv) {
@@ -675,6 +704,7 @@ VfsHandlers unixSocketHandlers = {.sendto = unixSocketSendto,
                                   .recvmsg = unixSocketRecvmsg,
                                   .duplicate = unixSocketDuplicate,
                                   .close = unixSocketClose,
+                                  .reportKey = unixSocketReportKey,
                                   .internalPoll = unixSocketInternalPoll};
 
 VfsHandlers unixAcceptHandlers = {.sendto = unixSocketAcceptSendto,
@@ -683,4 +713,5 @@ VfsHandlers unixAcceptHandlers = {.sendto = unixSocketAcceptSendto,
                                   .getpeername = unixSocketAcceptGetpeername,
                                   .duplicate = unixSocketAcceptDuplicate,
                                   .close = unixSocketAcceptClose,
+                                  .reportKey = unixSocketAcceptReportKey,
                                   .internalPoll = unixSocketAcceptInternalPoll};

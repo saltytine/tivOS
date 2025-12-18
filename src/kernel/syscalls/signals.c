@@ -154,7 +154,7 @@ bool signalsPendingQuick(void *taskPtr) {
 bool signalsRevivableState(int state) {
   return state == TASK_STATE_WAITING_CHILD ||
          state == TASK_STATE_WAITING_CHILD_SPECIFIC ||
-         state == TASK_STATE_FUTEX;
+         state == TASK_STATE_FUTEX || state == TASK_STATE_BLOCKED;
 }
 
 // these functions should be fairly bare-bones as they are invoked from
