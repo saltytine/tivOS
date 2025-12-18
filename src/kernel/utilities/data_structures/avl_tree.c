@@ -121,7 +121,7 @@ AVLheader *AVLAllocateL(AVLheader *node, avlkey key, AVLheader **target) {
   return node;
 }
 
-AVLheader *AVLUnregisterL(AVLheader *root, avlkey key, AVLheader **target) {
+AVLheader *AVLUnregisterL(AVLheader *root, avlkey key, avlval *target) {
   /* 1. BST delete */
   if (!root)
     return root;
@@ -143,8 +143,8 @@ AVLheader *AVLUnregisterL(AVLheader *root, avlkey key, AVLheader **target) {
         memcpy(root, temp, sizeof(AVLheader)); // Copy the contents of
                                                // the non-empty child
       assert(!(*target));
-      *target = temp;
-      // free(temp);
+      *target = temp->value;
+      free(temp);
     } else {
       // node with two children: Get the inorder
       // successor (smallest in the right subtree)
@@ -200,18 +200,9 @@ void *AVLAllocate(void **AVLfirstPtr, avlkey key, avlval value) {
 }
 
 bool AVLUnregister(void **AVLfirstPtr, avlkey key) {
-  AVLheader *target = 0;
+  avlval target = 0;
   *AVLfirstPtr = AVLUnregisterL(*AVLfirstPtr, key, &target);
   return !!target;
-}
-
-bool AVLFree(void **AVLfirstPtr, avlkey key) {
-  AVLheader *target = 0;
-  *AVLfirstPtr = AVLUnregisterL(*AVLfirstPtr, key, &target);
-  if (!target)
-    return false;
-  free(target);
-  return true;
 }
 
 avlval AVLLookup(void *raw, avlkey key) {
