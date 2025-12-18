@@ -51,7 +51,8 @@ StackStorePtrStyle stackStorePtrStyle(Task *target, int ptrc, char **ptrv) {
 
 void stackGenerateUser(Task *target, uint32_t argc, char **argv, uint32_t envc,
                        char **envv, uint8_t *out, size_t filesize,
-                       void *elf_ehdr_ptr, size_t at_base) {
+                       void *elf_ehdr_ptr, size_t at_base,
+                       size_t executableBase) {
   Elf64_Ehdr *elf_ehdr = (Elf64_Ehdr *)(elf_ehdr_ptr);
 
   // yeah, we will need to construct a stackframe...
@@ -113,7 +114,8 @@ void stackGenerateUser(Task *target, uint32_t argc, char **argv, uint32_t envc,
                 elf_ehdr->e_phentsize);
   PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t, 4);
   // aux: AT_ENTRY
-  PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t, elf_ehdr->e_entry);
+  PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t,
+                executableBase + elf_ehdr->e_entry);
   PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t, 9);
   // aux: AT_BASE // todo: not hardcode
   PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t, at_base);
@@ -126,7 +128,7 @@ void stackGenerateUser(Task *target, uint32_t argc, char **argv, uint32_t envc,
   PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t, 16);
   // aux: AT_PHDR
   PUSH_TO_STACK(target->registers.usermode_rsp, size_t,
-                phdrThing + elf_ehdr->e_phoff);
+                executableBase + phdrThing + elf_ehdr->e_phoff);
   PUSH_TO_STACK(target->registers.usermode_rsp, uint64_t, 3);
 
   // store arguments & environment variables in heap
