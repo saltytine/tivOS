@@ -196,6 +196,7 @@ void taskCallReaper(Task *target) {
       return;
     }
     spinlockRelease(&LOCK_REAPER);
+    handControl();
   }
 }
 
