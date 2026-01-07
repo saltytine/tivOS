@@ -28,6 +28,12 @@ void initiateNetworking() {
   debugf("[networking] Ready to scan for NICs..\n");
 }
 
+bool lwipOutputCb(void *data, void *netif) {
+  PCI *pci = data;
+  NIC *nic = (NIC *)pci->extra;
+  return pci->category == PCI_DRIVER_CATEGORY_NIC && &nic->lwip == netif;
+}
+
 err_t lwipOutput(struct netif *netif, struct pbuf *p) {
   uint8_t     *complete = malloc(p->tot_len);
   struct pbuf *browse = p;
@@ -46,14 +52,7 @@ err_t lwipOutput(struct netif *netif, struct pbuf *p) {
     panic();
   }
 
-  PCI *pci = firstPCI;
-  while (pci) {
-    NIC *nic = (NIC *)pci->extra;
-    if (pci->category == PCI_DRIVER_CATEGORY_NIC && &nic->lwip == netif)
-      break;
-    pci = pci->next;
-  }
-
+  PCI *pci = LinkedListSearch(&dsPCI, lwipOutputCb, netif);
   if (!pci) {
     debugf("[nics] Coudln't find netif to pass!\n");
     panic();
@@ -117,7 +116,6 @@ NIC *createNewNIC(PCI *pci) {
   NIC *nic = malloc(sizeof(NIC));
   memset(nic, 0, sizeof(NIC));
 
-  nic->dhcpTransactionID = rand();
   nic->mtu = 1500;
 
   pci->extra = nic;

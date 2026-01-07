@@ -123,6 +123,9 @@ Task *taskCreate(uint32_t id, uint64_t rip, bool kernel_task, uint64_t *pagedir,
   target->infoFiles = taskInfoFilesAllocate();
   target->infoSignals = taskInfoSignalAllocate();
 
+  LinkedListInit(&target->dsChildTerminated, sizeof(KilledInfo));
+  LinkedListInit(&target->dsSysIntr, sizeof(TaskSysInterrupted));
+
   memset(target->fpuenv, 0, 512);
   ((uint16_t *)target->fpuenv)[0] = 0x37f;
   target->mxcsr = 0x1f80;
@@ -210,7 +213,7 @@ void taskKill(uint32_t id, uint16_t ret) {
   if (task->parent && !task->noInformParent) {
     spinlockAcquire(&task->parent->LOCK_CHILD_TERM);
     KilledInfo *info = (KilledInfo *)LinkedListAllocate(
-        (void **)(&task->parent->firstChildTerminated), sizeof(KilledInfo));
+        &task->parent->dsChildTerminated, sizeof(KilledInfo));
     info->pid = task->id;
     info->ret = ret;
     task->parent->childrenTerminatedAmnt++;
@@ -435,6 +438,9 @@ Task *taskFork(AsmPassedInterrupt *cpu, uint64_t rsp, int cloneFlags,
     target->infoSignals = share;
   }
 
+  LinkedListInit(&target->dsChildTerminated, sizeof(KilledInfo));
+  LinkedListInit(&target->dsSysIntr, sizeof(TaskSysInterrupted));
+
   // they get inherited, but can still be changed thread-wise!
   target->sigBlockList = currentTask->sigBlockList;
 
@@ -469,6 +475,7 @@ Task *taskFork(AsmPassedInterrupt *cpu, uint64_t rsp, int cloneFlags,
   return target;
 }
 
+// todo! WONKY DS & RETHINK THIS SYSTEM!!
 void taskBlock(Blocking *blocking, Task *task, Spinlock *releaseAfter,
                bool apply) {
   assert(task == currentTask); // otherwise, it exits with ptr dangling
@@ -477,15 +484,15 @@ void taskBlock(Blocking *blocking, Task *task, Spinlock *releaseAfter,
   spinlockAcquire(&blocking->LOCK_LL_BLOCKED);
 
   // it's rare enough more than one task is blocked together, go through it
-  BlockedTask *browse = blocking->firstBlockedTask;
+  BlockedTask *browse = (BlockedTask *)blocking->dsBlockedTask.firstObject;
   while (browse) {
     if (browse->task == task)
       debugf("[task::blocking] WARNING! Duplicate task!\n");
-    browse = browse->next;
+    browse = (BlockedTask *)browse->_ll.next;
   }
 
-  BlockedTask *blockedTask = LinkedListAllocate(
-      (void **)(&blocking->firstBlockedTask), sizeof(BlockedTask));
+  BlockedTask *blockedTask =
+      LinkedListAllocate(&blocking->dsBlockedTask, sizeof(BlockedTask));
   blockedTask->task = task;
   spinlockRelease(&blocking->LOCK_LL_BLOCKED);
 
@@ -499,15 +506,15 @@ void taskBlock(Blocking *blocking, Task *task, Spinlock *releaseAfter,
 
 void taskUnblock(Blocking *blocking) {
   spinlockAcquire(&blocking->LOCK_LL_BLOCKED);
-  BlockedTask *browse = blocking->firstBlockedTask;
+  BlockedTask *browse = (BlockedTask *)blocking->dsBlockedTask.firstObject;
   while (browse) {
-    BlockedTask *next = browse->next;
+    BlockedTask *next = (BlockedTask *)browse->_ll.next;
     if (browse->task) {
       Task *task = browse->task;
       if (task->state != TASK_STATE_DEAD)
         task->state = TASK_STATE_READY;
     }
-    LinkedListRemove((void **)(&blocking->firstBlockedTask), browse);
+    LinkedListRemove(&blocking->dsBlockedTask, sizeof(BlockedTask), browse);
     browse = next;
   }
   spinlockRelease(&blocking->LOCK_LL_BLOCKED);
@@ -538,6 +545,8 @@ void initiateTasks() {
   currentTask->infoFiles = taskInfoFilesAllocate();
   currentTask->infoFiles->fdBitmap[0] = (uint8_t)-1;
   currentTask->infoSignals = 0; // no, just no!
+  LinkedListInit(&currentTask->dsChildTerminated, sizeof(KilledInfo));
+  LinkedListInit(&currentTask->dsSysIntr, sizeof(TaskSysInterrupted));
   taskNameKernel(currentTask, entryCmdline, sizeof(entryCmdline));
 
   void  *tssRsp = VirtualAllocate(USER_STACK_PAGES);
