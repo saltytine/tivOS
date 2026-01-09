@@ -191,8 +191,8 @@ void handlePacket(NIC *nic, void *packet, uint32_t size) {
 // outside stuff
 
 QueuePacket netQueue[QUEUE_MAX];
-int         netQueueRead = 0;
-int         netQueueWrite = 0;
+atomic_int  netQueueRead = 0;
+atomic_int  netQueueWrite = 0;
 
 void netQueueAdd(NIC *nic, uint8_t *packet, uint16_t packetLength) {
   if ((netQueueWrite + 1) % QUEUE_MAX == netQueueRead) {

@@ -86,5 +86,6 @@ size_t ppoll(struct pollfd *fds, int nfds, struct timespec *timeout,
 
 size_t select(int nfds, uint8_t *read, uint8_t *write, uint8_t *except,
               struct timeval *timeout);
+void   pollIndependentAwait(OpenFile *fd, int epollEvents);
 
 #endif

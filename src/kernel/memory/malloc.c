@@ -6263,7 +6263,7 @@ History:
       * realloc: try to expand in both directions
       * malloc: swap order of clean-bin strategy;
       * realloc: only conditionally expand backwards
-      * Try not to scavenge used bins
+      * Try not to stivenge used bins
       * Use bin counts as a guide to preallocation
       * Occasionally bin return list chunks in first scan
       * Add a few optimizations from colin@nyx10.cs.du.edu

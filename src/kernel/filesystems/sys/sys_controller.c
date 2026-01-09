@@ -140,8 +140,8 @@ VfsHandlers tivosConsoleHandlers = {.write = tivosConsoleWrite};
 
 void sysSetup() {
   FakefsFile *rootFile = (FakefsFile *)rootSys.rootFile.firstObject;
-  fakefsAddFile(&rootSys, rootFile, "tivosConsole", 0,
-                S_IFLNK | S_IRUSR | S_IFREG, &tivosConsoleHandlers);
+  fakefsAddFile(&rootSys, rootFile, "tivosConsole", 0, S_IRUSR | S_IFREG,
+                &tivosConsoleHandlers);
 
   FakefsFile *bus =
       fakefsAddFile(&rootSys, rootFile, "bus", 0, S_IFDIR | S_IRUSR | S_IWUSR,

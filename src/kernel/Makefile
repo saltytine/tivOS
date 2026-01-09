@@ -42,7 +42,7 @@ all: $(C_OBJS) $(ASM_OBJS) $(C_EXTRA_OBJS)
 	mkdir $(TARGET)/ -p
 	mkdir $(TARGET)/boot/ -p
 	$(LINKER) $(LDFLAGS) -o $(OUTPUT) $(C_OBJS) $(C_EXTRA_OBJS) $(ASM_OBJS)
-
+	
 memory/malloc.o:memory/malloc.c
 	$(COMPILER) $(CFLAGS) memory/malloc.c -o memory/malloc.o -DHAVE_MMAP=0 -DLACKS_TIME_H=1 -DLACKS_SYS_PARAM_H=1 -LACKS_STRING_H=0 -Dmalloc_getpagesize=4096 -DNO_MALLOC_STATS=1 -DMORECORE_CONTIGUOUS=0 -DUSE_LOCKS=2 "-DMALLOC_FAILURE_ACTION=abort()"
 
@@ -69,7 +69,7 @@ vmware:
 tools:
 	chmod +x $(TOOLS)/toolchain/get_tools.sh
 	$(TOOLS)/toolchain/get_tools.sh
-
+	
 clean:
 # rm -f $(TARGET)/obj/*.o
 	find . -name '*.o' -delete

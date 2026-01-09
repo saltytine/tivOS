@@ -148,3 +148,8 @@ bool LinkedListSearchPtrCb(void *data, void *targetPtr) {
 void *LinkedListSearchPtr(LLcontrol *ll, void *targetPtr) {
   return LinkedListSearch(ll, LinkedListSearchPtrCb, targetPtr);
 }
+
+bool  LinkedListSearchFirstCb(void *data, void *ctx) { return true; }
+void *LinkedListSearchFirst(LLcontrol *ll) {
+  return LinkedListSearch(ll, LinkedListSearchFirstCb, 0);
+}

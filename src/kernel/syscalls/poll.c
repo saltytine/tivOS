@@ -454,6 +454,29 @@ uint32_t pollToEpollComp(uint32_t poll_events) {
   return epoll_events;
 }
 
+// does NOT guarantee anything, you have to check manually after this
+void pollIndependentAwait(OpenFile *fd, int epollEvents) {
+  spinlockAcquire(&LOCK_POLL_ROOT);
+  PollInstance *instance = pollInstanceAllocate();
+  spinlockRelease(&LOCK_POLL_ROOT);
+
+  assert(fd->handlers->reportKey && fd->handlers->internalPoll);
+  size_t key = fd->handlers->reportKey(fd);
+  assert(key);
+  spinlockAcquire(&LOCK_POLL_ROOT);
+  int revents = fd->handlers->internalPoll(fd, epollEvents);
+  if (revents != 0) {
+    pollInstanceDestroy(instance, true);
+    spinlockRelease(&LOCK_POLL_ROOT);
+    return;
+  }
+  pollItemAdd(instance, key, epollEvents);
+  pollInstanceWait(instance, 0); // lock released here
+  pollInstanceDestroy(instance, false);
+
+  // now you check interrupted by signal, etc
+}
+
 size_t poll(struct pollfd *fds, int nfds, int timeout) {
   if (nfds < 0)
     return ERR(EINVAL);

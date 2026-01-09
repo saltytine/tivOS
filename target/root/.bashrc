@@ -9,7 +9,7 @@ source /etc/profile
 
 # Only if nothing has already set it (like a terminal emulator)
 if [ -z "${TERM}" ] || [ "${TERM}" == "dumb" ]; then
-    export TERM=linux
+	export TERM=linux
 fi
 
 alias ls='ls --color=auto'
@@ -18,7 +18,7 @@ alias dir="dir --color=auto"
 alias mpv="mpv -no-audio"
 
 # some helpful aliases
-alias a="rm -f /var/log/Xorg.0.log && echo d > /sys/tivosConsole && xinit && echo e > /sys/tivosConsole"
+alias a="rm -f /var/log/Xorg.0.log && echo d > /sys/cavosConsole && xinit && echo e > /sys/cavosConsole"
 alias b="wget -O /dev/null https://ash-speed.hetzner.com/1GB.bin"
 alias c="/usr/libexec/webkit2gtk-4.1/MiniBrowser"
 alias d="mpv -no-audio --player-operation-mode=pseudo-gui"

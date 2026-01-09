@@ -1,6 +1,8 @@
+#include "arp.h"
 #include "pci.h"
 #include "system.h"
 #include "types.h"
+#include "udp.h"
 
 #include <lwip/netif.h>
 
@@ -26,10 +28,13 @@ struct NIC {
   uint8_t  dnsIp[4];
   uint8_t  subnetMask[4];
   uint8_t  irq;
+
+  arpStore arp;
+  UdpStore udp;
 };
 #define defaultIP ((uint8_t[]){0, 0, 0, 0})
-#define macBroadcast ((uint8_t[]){255, 255, 255, 255, 255, 255})
-#define macZero ((uint8_t[]){0, 0, 0, 0, 0, 0})
+// #define macBroadcast ((uint8_t[]){255, 255, 255, 255, 255, 255})
+// #define macZero ((uint8_t[]){0, 0, 0, 0, 0, 0})
 
 NIC *selectedNIC;
 
@@ -77,8 +82,8 @@ typedef struct QueuePacket {
 } QueuePacket;
 
 QueuePacket netQueue[QUEUE_MAX];
-int         netQueueRead;
-int         netQueueWrite;
+atomic_int  netQueueRead;
+atomic_int  netQueueWrite;
 
 void netQueueAdd(NIC *nic, uint8_t *packet, uint16_t packetLength);
 

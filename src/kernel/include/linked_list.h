@@ -33,6 +33,7 @@ void  LinkedListTraverse(LLcontrol *ll, void(callback)(void *data, void *ctx),
                          void      *ctx);
 void *LinkedListSearch(LLcontrol *ll, bool(isCorrect)(void *data, void *ctx),
                        void      *ctx);
+void *LinkedListSearchFirst(LLcontrol *ll);
 void *LinkedListSearchPtr(LLcontrol *ll, void *targetPtr);
 
 #endif

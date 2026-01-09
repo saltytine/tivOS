@@ -18,6 +18,8 @@
 #define SPLIT_32_HIGHER(value) ((value) >> 16)
 #define SPLIT_32_LOWER(value) ((value) & 0xFFFF)
 
+#define UNIX_TIME_PASSED(time, ms) ((time + ms) < timerTicks)
+
 #define IS_ALIGNED(addr, align) (((addr) & ((align) - 1)) == 0)
 
 const char *ANSI_RESET;

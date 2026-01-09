@@ -93,7 +93,7 @@ void _start(void) {
 
   printf("=========================================\n");
   printf("==        TIV Operating System         ==\n");
-  printf("==          For TIV by TIV             ==\n");
+  printf("==           For TIV by TIV            ==\n");
   printf("=========================================\n\n");
 
   while (1)

@@ -1,11 +1,12 @@
 # TIV Operating System
-tivOS is a POSIX-compliant operating system in C. An active effort of making a full OS, with a simple and readable codebase.
+tivOS is an x86_64 POSIX-compliant operating system in C. An active effort of making a full OS, with a simple and readable codebase.
 
 [![GitHub top language](https://img.shields.io/github/languages/top/saltytine/tivOS?logo=c&label=)](https://github.com/saltytine/tivOS/blob/master/src/kernel/Makefile)
 [![GitHub license](https://img.shields.io/github/license/saltytine/tivOS)](https://github.com/saltytine/tivOS/blob/master/LICENSE)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e78ad48f394f46d1bb98f1942c7e1f21)]()
 [![GitHub contributors](https://img.shields.io/github/contributors/saltytine/tivOS)](https://github.com/saltytine/tivOS/graphs/contributors)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/saltytine/tivOS)](https://github.com/saltytine/tivOS/commits)
+
 
 ## Why make your own OS in [insert year]?
 > **because I can.**
@@ -20,7 +21,7 @@ The tivOS kernel is a monolithic x86_64 one written in relatively simple C with 
 - ACPI mode, using I/O APIC redirects for interrupts
 - PCI scanning and various PCI device drivers
 - Full network stack (including TCP and DHCP) with network interface support (Intel E1000, Realtek RTL8139/RTL8169)
-- Two-way pipes and Unix domain sockets (AF_UNIX), eventfds, futexes, and signal support (with some BSD extensions)
+- Two-way pipes, Unix domain sockets (AF_UNIX), eventfds, futexes, and signal support (with some BSD extensions)
 - FAT32, Ext2 and virtual file systems (/proc, /sys, /dev, etc)
 - PS/2 Keyboard/Mouse drivers along with serial port (COM1, COM2, etc) output
 - ELF64 binary loading, dynamic linking and shared libraries
@@ -31,12 +32,14 @@ The tivOS kernel is a monolithic x86_64 one written in relatively simple C with 
 ## Userspace status
 Userspace is my primary focus at the time being, with the kernel being *quite* stable. I'm trying to make this OS as close to Linux as I can, while adding my own stuff on top of it. This is visible with the system calls that are exactly like Linux's. That isn't random, I want tivOS to be as binary compatible with it as possible!
 
+As far as the actual implementation goes, I'm using the `apk` package manager from Alpine Linux and their respective repositories for userspace assembly. Alpine's & musl's philosophy align with the tivOS one and I really see no point in recompiling stuff myself if I don't necessarily have to.
+
 ## Frequently asked questions (FAQ)
-- **Where do I download cavOS?** You don't. It is by no means mature enough for an actual release yet, so you have to compile it yourself. It's not as difficult as other OSes, there are only a few short commands you have to run.
-- **Is this a Linux distribution?** No! The cavOS kernel does not share source code or headers with Linux. Some header definitions are obviously present but that is just to support the userspace. Internally the cavOS kernel doesn't have much in common with Linux other than the fact that it's monolithic. This layout may change in the future with cavOS-specific extensions being added as well.
-- **How do I get inside the GUI?** cavOS utilizes the xorg server (also known as X11 or X.org) to render a graphical UI. In order to start it up from the console, just run `a`.
+- **Where do I download tivOS?** You don't. It is by no means mature enough for an actual release yet, so you have to compile it yourself. It's not as difficult as other OSes, there are only a few short commands you have to run.
+- **Is this a Linux distribution?** No! The tivOS kernel does not share source code or headers with Linux. Some header definitions are obviously present but that is just to support the userspace. Internally the tivOS kernel doesn't have much in common with Linux other than the fact that it's monolithic. This layout may change in the future with tivOS-specific extensions being added as well.
+- **How do I get inside the GUI?** tivOS utilizes the xorg server (also known as X11 or X.org) to render a graphical UI. In order to start it up from the console, just run `a`.
 - **Why is RAM usage this high?** As you might've already guessed, the RAM usage reported by tools like fastfetch or free are a bit misleading. They don't match up to the typical Linux counterpart, as a lot of mmap() operations belong to other categories (like Buffers/Cached or likewise). This issue will eventually be fixed when features like COW are implemented along with others.
-- **I found issues on the shell before launching the GUI...** Keep in mind that cavOS' TTY equivalent doesn't support that many ASCII codes and is generally badly written. You can open PRs to fix that, but I'm focusing on other stuff at the moment.
+- **I found issues on the shell before launching the GUI...** Keep in mind that tivOS' TTY equivalent doesn't support that many ASCII codes and is generally badly written. You can open PRs to fix that, but I'm focusing on other stuff at the moment.
 
 ## Documentation
 - **Contributing:** Information about contribution guidelines & suggestions [docs/contributing.md](docs/contributing.md)
@@ -45,14 +48,15 @@ Userspace is my primary focus at the time being, with the kernel being *quite* s
 ## Credits
 - [Limine](https://github.com/limine-bootloader/limine): Modern, advanced, portable, multiprotocol bootloader and boot manager
 - [uACPI](https://github.com/uACPI/uACPI): A portable and easy-to-integrate implementation of the ACPI
+- [Alpine Package Keeper](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper): Alpine Linux's package management solution and official repositories
 - [lwIP](https://savannah.nongnu.org/projects/lwip/): A small independent implementation of the TCP/IP protocol suite 
 - [dlmalloc](https://gee.cs.oswego.edu/pub/misc/): Doug Lea's Memory Allocator, a good all purpose memory allocator that is widely used and ported
 - [eyalroz/printf](https://github.com/eyalroz/printf): Tiny, fast(ish), self-contained, fully loaded printf, sprinf etc. implementation
-- [G-9](https://nr9.online/): Made the ASCII art for the kernel's `fetch` command
+- [G-9](https://nr9.online/): Made the ASCII art for the kernel shell's `fetch` command
+
+# Related repos (from pwnjester)
+- [tiv-repo](https://github.com/pwnjester/tiv-repo) tivOS packaging system
+- [tiv-pkg](https://github.com/pwnjester/tiv-pkg) tivOS package manager
 
 ## License
 This project is licensed under GPL v3 (GNU General Public License v3.0). For more information go to the [LICENSE](LICENSE) file.
-
-## Related repos (from pwnjester)
-[tiv-repo](https://github.com/pwnjester/tiv-repo) tivOS packaging system  
-[tiv-pkg](https://github.com/pwnjester/tiv-pkg) tivOS package manager  
